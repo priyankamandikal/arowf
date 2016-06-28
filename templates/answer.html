@@ -1,0 +1,58 @@
+{# answer.html template
+
+   parameters:
+     record: filenumber
+     response: type of response needed, (a)nswer, (r)eview, or (t)iebreaker
+     files: dictionary mapping from suffixes (q,a,e,o,t) to text
+
+   POSTs:
+     record = request.form['record']     # file number with zeroes
+     response = request.form['response'] # [submit button] 1 of: a,e,o,te,to
+     answer = request.form['answer']     # text (maybe audio someday)
+#}
+{% extends "layout.html" %}
+{% block body %}
+  {% if response == 'a' %}
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please answer this question.</h2>
+        <h3>Question:</h3>
+        {{ files['q'] }}
+        <h3>Your answer:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=a>Answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
+  {% elif response == 'r' %}
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please review the proposed answer to this question.</h2>
+        <h3>Question:</h3>
+        {{ files['q'] }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        <h3>Your comments:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=e>Endorse proposed answer</button>
+        <button type=submit name=response value=o>Oppose proposed answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
+  {% elif response == 't' %}
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please decide between this question's proposed answer and opposing comments.</h2>
+        <h3>Question:</h3> 
+        {{ files['q'] }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        <h3>Comments opposing that proposed answer:</h3> 
+        {{ files['o'] }}
+        <h3>Your comments:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=te>Endorse proposed answer</button>
+        <button type=submit name=response value=to>Oppose proposed answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
+  {% endif %}
+{% endblock %}
+

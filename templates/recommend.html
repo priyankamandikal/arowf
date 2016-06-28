@@ -1,0 +1,37 @@
+{# recommend.html template
+
+   parameters:
+     record: filenumber
+     files: dictionary mapping from suffixes (q,a,e,o,t) to text
+
+   POSTs:
+     record = request.form['record']         # file number with zeroes
+     resolution = request.form['resolution'] # implementation, e.g. diff URL
+#}
+{% extends "layout.html" %}
+{% block body %}
+    <form action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
+      <h2>Please implement this recommendation.</h2>
+        <h3>Question:</h3> 
+        {{ files['q'] }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        {% if files ['e'] is defined %}
+          {% if files ['t'] is defined %}
+            <h2>That answer had initially been opposed with these comments:</h2> 
+            {{ files['t'] }}
+          {% endif %}
+          <h2>The answer was endorsed with these comments:</h2> 
+          {{ files['e'] }}
+        {% else %}
+          <h2>The answer was opposed with these comments:</h2> 
+          {{ files['o'] }}
+        {% endif %}
+        <h3>Your implementation:</h3>
+        <textarea name=resolution rows=5 cols=70></textarea>
+        <br />
+        <input type=submit name=response value=Done />
+        <input type=hidden name=record value={{ record }} />
+    </form>
+{% endblock %}
+
