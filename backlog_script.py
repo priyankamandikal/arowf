@@ -33,7 +33,7 @@ if __name__ == '__main__':
 					print('A billion questions reached! Answer!')
 					exit()
 				f = open(fn, 'w')
-				f.write(categ + '\n' + title + '\n' + url +'\n')	# in file, print <backlog category>, <title>, <url>
+				f.write(categ + '\n' + title + '\n' + link +'\n')	# in file, print <backlog category>, <title>, <link>
 				f.close()
 
 	except:
