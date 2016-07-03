@@ -1,10 +1,10 @@
 <!doctype html>
-<title>Web review system for arowf.org</title>
+<title>Minireview review system for arowf.org</title>
 <link rel=stylesheet type=text/css
  href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
-	<h1>Web review system</h1>
-	{% for message in get_flashed_messages() %}{# is this working?!? #}
+	<h1>Minireview</h1>
+	{% for message in get_flashed_messages() %}
 		<div class=flash>{{ message }}</div>
 	{% endfor %}
 	{% block body %}{% endblock %}

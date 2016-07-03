@@ -16,7 +16,7 @@
     <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
       <h2>Please answer this question.</h2>
         <h3>Question:</h3>
-        {{ files['q'] }}
+        {{ files['q']|safe }}
         <h3>Your answer:</h3>
         <textarea name=answer rows=5 cols=70></textarea>
         <br />
@@ -27,7 +27,7 @@
     <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
       <h2>Please review the proposed answer to this question.</h2>
         <h3>Question:</h3>
-        {{ files['q'] }}
+        {{ files['q']|safe }}
         <h3>Proposed answer:</h3> 
         {{ files['a'] }}
         <h3>Your comments:</h3>
@@ -41,7 +41,7 @@
     <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
       <h2>Please decide between this question's proposed answer and opposing comments.</h2>
         <h3>Question:</h3> 
-        {{ files['q'] }}
+        {{ files['q']|safe }}
         <h3>Proposed answer:</h3> 
         {{ files['a'] }}
         <h3>Comments opposing that proposed answer:</h3> 
