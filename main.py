@@ -278,9 +278,9 @@ def inspect():
 
 if __name__ == '__main__':
     app.run(
-      use_reloader = True # reloads this source file when changed
+      use_reloader = True # reloads this source file when changed # runs on http://127.0.0.1:5000/
+
     ## , use_debugger=True # see http://flask.pocoo.org/docs/0.11/errorhandling/
-           )                    # runs on http://127.0.0.1:5000/
 
 # end
 

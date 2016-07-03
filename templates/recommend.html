@@ -10,16 +10,22 @@
 #}
 {% extends "layout.html" %}
 {% block body %}
-  <form action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
-    <h2>Please implement this recommendation.</h2>
-      <h3>Question:</h3> 
-      {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
-      {{ files['a']|safe }}
-      {% if files ['e'] is defined %}
-        {% if files ['t'] is defined %}
-          <h2>That answer had initially been opposed with these comments:</h2> 
-          {{ files['t']|safe }}
+    <form action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
+      <h2>Please implement this recommendation.</h2>
+        <h3>Question:</h3> 
+        {{ files['q']|safe }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        {% if files ['e'] is defined %}
+          {% if files ['t'] is defined %}
+            <h2>That answer had initially been opposed with these comments:</h2> 
+            {{ files['t'] }}
+          {% endif %}
+          <h2>The answer was endorsed with these comments:</h2> 
+          {{ files['e'] }}
+        {% else %}
+          <h2>The answer was opposed with these comments:</h2> 
+          {{ files['o'] }}
         {% endif %}
         <h2>The answer was endorsed with these comments:</h2> 
         {{ files['e']|safe }}

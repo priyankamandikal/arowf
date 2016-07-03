@@ -15,52 +15,46 @@
 {% block body %}
   <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
   {% if response == 'a' %}
-    <h2>Please answer this question.</h2>
-      <h3>Question:</h3>
-      {{ files['q']|safe }}
-      <h3>Your answer:</h3>
-      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
-      <br/>
-      <h3>Optionally add a pertinent web page:</h3>
-      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
-             style="width: 70%;" />
-      <input type=button value=Preview onclick="LoadIframe(); return False;" />
-      <button type=submit name=response value=a>Answer</button>
-      <input type=hidden name=record value={{ record }} />
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please answer this question.</h2>
+        <h3>Question:</h3>
+        {{ files['q']|safe }}
+        <h3>Your answer:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=a>Answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
   {% elif response == 'r' %}
-    <h2>Please review the proposed answer to this question.</h2>
-      <h3>Question:</h3>
-      {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
-      {{ files['a']|safe }}
-      <h3>Your comments:</h3>
-      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
-      <br/>
-      <h3>Optionally add a pertinent web page:</h3>
-      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
-             style="width: 40%;" />
-      <input type=button value=Preview onclick="LoadIframe(); return False;" />
-      <button type=submit name=response value=e>Endorse proposed answer</button>
-      <button type=submit name=response value=o>Oppose proposed answer</button>
-      <input type=hidden name=record value={{ record }} />
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please review the proposed answer to this question.</h2>
+        <h3>Question:</h3>
+        {{ files['q']|safe }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        <h3>Your comments:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=e>Endorse proposed answer</button>
+        <button type=submit name=response value=o>Oppose proposed answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
   {% elif response == 't' %}
-    <h2>Please decide between this question's proposed answer and opposing comments.</h2>
-      <h3>Question:</h3> 
-      {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
-      {{ files['a']|safe }}
-      <h3>Comments opposing that proposed answer:</h3> 
-      {{ files['o']|safe }}
-      <h3>Your comments:</h3>
-      <textarea name=answer  style="width: 80%; height: 15%;"></textarea>
-      <br/>
-      <h3>Optionally add a pertinent web page:</h3>
-      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
-             style="width: 40%;" />
-      <input type=button value=Preview onclick="LoadIframe(); return False;" />
-      <button type=submit name=response value=te>Endorse proposed answer</button>
-      <button type=submit name=response value=to>Oppose proposed answer</button>
-      <input type=hidden name=record value={{ record }} />
+    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
+      <h2>Please decide between this question's proposed answer and opposing comments.</h2>
+        <h3>Question:</h3> 
+        {{ files['q']|safe }}
+        <h3>Proposed answer:</h3> 
+        {{ files['a'] }}
+        <h3>Comments opposing that proposed answer:</h3> 
+        {{ files['o'] }}
+        <h3>Your comments:</h3>
+        <textarea name=answer rows=5 cols=70></textarea>
+        <br />
+        <button type=submit name=response value=te>Endorse proposed answer</button>
+        <button type=submit name=response value=to>Oppose proposed answer</button>
+        <input type=hidden name=record value={{ record }} />
+    </form>
   {% endif %}
   </form>
   <iframe id=iframeobj name=iframeobj 
