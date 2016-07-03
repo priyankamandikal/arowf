@@ -1,0 +1,52 @@
+{# inspect.html template (GET only, no POSTs)
+
+   parameters:
+        count, first, last, mindate, maxdate, meandate,
+        searchstring, stringqs[], stringas[], stringes[],
+                      stringos[], stringts[], stringds[], 
+        reviewer, revas[], reves[], revos[], revts[],
+                  reviewercount, revieweragree, reviewerdised
+
+                  displays revieweragree/(reviewerdised+revieweragree)
+                  as a percent ratio if its denominator is positive
+#}
+{% extends "layout.html" %}
+{% block body %}
+  <h2>Summary statistics</h2>
+    <table>
+      <tr><td>Files:</td><td>{{ count }}</td></tr>
+      <tr><td>First:</td><td>{{ first }}</td></tr>
+      <tr><td>Last:</td><td>{{ last }}</td></tr>
+      <tr><td>Earliest:</td><td>{{ mindate }}</td></tr>
+      <tr><td>Latest:</td><td>{{ maxdate }}</td></tr>
+      <tr><td>Mean date:</td><td>{{ meandate }}</td></tr>
+    </table>
+    {% if searchstring %}
+    <table>
+      <tr><td>?q=string search for:</td><td>{{ searchstring }}</td></tr>
+      <tr><td>-q files:</td><td>{{ stringqs|length }}</td></tr>
+      <tr><td>-a files:</td><td>{{ stringas|length }}</td></tr>
+      <tr><td>-e files:</td><td>{{ stringes|length }}</td></tr>
+      <tr><td>-o files:</td><td>{{ stringos|length }}</td></tr>
+      <tr><td>-t files:</td><td>{{ stringts|length }}</td></tr>
+      <tr><td>-d files:</td><td>{{ stringds|length }}</td></tr>
+    </table>
+    {% endif %}
+    {% if reviewer %}
+    <table>
+      <tr><td>?r=reviewer search for:</td><td>{{ reviewer }}</td></tr>
+      <tr><td>Total reviews:</td><td>{{ reviewercount }}</td></tr>
+      <tr><td>Times agreed with:</td><td>{{ revieweragree }}</td></tr>
+      <tr><td>Times disagreed with:</td><td>{{ reviewerdised }}</td></tr>
+      {% if revieweragree + reviewerdised > 0 %}
+        <tr><td>Agreement ratio:</td><td>{{ '%2.0f' % 
+        (revieweragree/(reviewerdised+revieweragree))/100.0 }}%</td></tr>
+      {% endif %}
+      <tr><td>-a files:</td><td>{{ revas|length }}</td></tr>
+      <tr><td>-e files:</td><td>{{ reves|length }}</td></tr>
+      <tr><td>-o files:</td><td>{{ revos|length }}</td></tr>
+      <tr><td>-t files:</td><td>{{ revts|length }}</td></tr>
+    </table>
+    {% endif %}
+{% endblock %}
+
