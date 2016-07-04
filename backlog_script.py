@@ -27,7 +27,7 @@ if __name__ == '__main__':
 				a = entry.find('a')
 				link = 'https://en.wikipedia.org' + a.get('href')
 				title = a.get('title').encode('utf8')
-				fn = recdir + nextrecord() + 'q'
+				fn = recdir + nextrecord() + 'qs'
 				print fn
 				if path.exists(fn):
 					print('A billion questions reached! Answer!')

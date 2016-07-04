@@ -25,6 +25,7 @@ from flask import Flask, render_template, redirect, url_for, \
 from os import listdir, rename, path # for path.sep, .exists() & .getmtime()
 from random import choice
 from time import ctime
+import re
 
 recdir = 'records' + path.sep                     # data subdirectory
 
@@ -51,18 +52,22 @@ def ask():
     if request.method == 'GET':
         return render_template('ask.html') # single textarea & submit button
     elif request.method == 'POST':
-        question = escape(request.form['question'])    # escape() raw input
+        question = request.form['question']    # escape() raw input
+        regexp = r'((https|ftp|file|http)://(((?!</p>| )).)*)'
+        question = re.sub(regexp,"<a href='\\1'>\\1</a>",question)
+        iframeurl = request.form['iframeurl']
         ### todo: hyperlink URLs in raw input with e.g. <a href="URL">URL</a>
         ### also sanity-check size of question field
-        fn = 'records' + path.sep + nextrecord() + 'q' # new question filename
+        fn = 'records' + path.sep + nextrecord() + 'qu' # new question filename
         # checking if the file exists should prevent overflow(?)
         if path.exists(fn):
             flash('Overflow: a billion questions is too many; sorry.')
             return redirect(url_for('index'))          # GET /
             ### RACE condition if two people call nextrecord() simultaniously
             ### ... maybe try adding the process ID to end of fn and renaming?
+        
         f = open(fn, 'w')
-        f.write(question+'\n') ### only add \n if not already at end? & below
+        f.write(iframeurl+'\n'+question+'\n') ### only add \n if not already at end? & below
         f.close()
         flash('Thanks for the question.')  # displays in layout.html
         return redirect(url_for('index'))  # GET /
@@ -71,9 +76,9 @@ def getrecords():
     records = {} # use a dictionary of file numbers to lists of suffixes
     for fn in listdir(recdir):             ### handle bad filenames
         if not fn[0:9] in records:
-            records[fn[0:9]] = [fn[9]]     # create file number's initial list
+            records[fn[0:9]] = [fn[9:]]     # create file number's initial list
         else:
-            records[fn[0:9]].append(fn[9]) # add file suffix to list
+            records[fn[0:9]].append(fn[9:]) # add file suffix to list
     return records
 
 @app.route('/answer', methods=['GET', 'POST'])
@@ -99,7 +104,7 @@ def answer():
         files = {}                          # files' contents in a suffix
         for suffix in records[chosen]:      # iterate over the files available
             f = open(recdir + chosen + suffix, 'r')
-            files[suffix] = f.read()        # read textual contents of each
+            files[suffix] = f.readlines()        # read textual contents of each
             f.close()
         return render_template('answer.html', record=chosen, response=needs,
                                files=files) # invoke the template
@@ -107,6 +112,8 @@ def answer():
         record = request.form['record']     # file number with zeroes
         response = request.form['response'] # [submit button] 1 of: a,e,o,te,to
         answer = request.form['answer']     # no escape(): templates not |safe
+        regexp = r'((https|ftp|file|http)://(((?!</p>| )).)*)'
+        answer = re.sub(regexp,"<a href='\\1'>\\1</a>",answer)
         ### todo: hyperlink URLs in raw input with e.g. <a href="URL">URL</a>
         if response in ['te', 'to']:        # tie breaker
             if path.exists(recdir + record + 't'):
@@ -144,12 +151,14 @@ def recommend():
         files = {}                              # to map file suffixes to text
         for suffix in suffixes:                 # iterate over available files
             f = open(recdir + selection + suffix, 'r')
-            files[suffix] = f.read()            # read textual contents of each
+            files[suffix] = f.readlines()            # read textual contents of each
             f.close()
         return render_template('recommend.html', record=selection, files=files) 
     elif request.method == 'POST':
         record = request.form['record']         # file num. w/zeroes ### check
         resolution = request.form['resolution'] # implementation, e.g. diff URL
+        regexp = r'((https|ftp|file|http)://(((?!</p>| )).)*)'
+        resolution = re.sub(regexp,"<a href='\\1'>\\1</a>",resolution)
         ### todo: hyperlink URLs in raw input with e.g. <a href="URL">URL</a>
         ### sanity-check size of resolution field; no escape() because no |safe
         fn = recdir + record + 'd'              # resolution filename
@@ -215,7 +224,7 @@ def inspect():
     return render_template('inspect.html', count=count, first=first, 
         last=last, mindate=ctime(mindate), maxdate=ctime(maxdate), 
         meandate=ctime(meandate),
-        searchstring=searchstring, stringqs=stringtimes['q'],
+        searchstring=searchstring, stringqs=stringtimes['qs'],
         stringas=stringtimes['a'], stringes=stringtimes['e'],
         stringos=stringtimes['o'], stringts=stringtimes['t'],
         stringds=stringtimes['d'], reviewer=reviewer, 
