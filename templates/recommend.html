@@ -14,25 +14,25 @@
       <h2>Please implement this recommendation.</h2>
         <h3>Question:</h3> 
         {% if 'qs' in files %}
-          <p>The article <a href={{files['qs'][2]}}><b>{{ files['qs'][1]|safe }}</b></a> in {{ files['qs'][0]|safe }}. How would you update it?</p>
+          <p>The article <a href={{files['qs'][2]}}><b>{{ files['qs'][1]|safe }}</b></a> is in {{ files['qs'][0]|safe }}. How would you update it?</p>
           <br/>
           <iframe name=iframeobj src={{ files['qs'][2]|safe }} style="height:250px;width:100%"></iframe>
         {% elif 'qu' in files %}
-          <p>{% for line in files['qu'][1:] %}{% print line %}</p>{% endfor %}
+          <p>{% for line in files['qu'][1:] %}{{ line }}</p>{% endfor %}
           <iframe name=iframeobj src={{files['qu'][0]|safe}} style="height:250px;width:100%"></iframe>
         {% endif %}
         <h3>Proposed answer:</h3> 
-        {% for line in files['a'] %}{% print line %}{% endfor %}
+        <p>{% for line in files['a'] %}{{ line }}</p>{% endfor %}
         {% if files ['e'] is defined %}
           {% if files ['t'] is defined %}
             <h3>That answer had initially been opposed with these comments:</h3> 
-            {% for line in files['t'] %}{% print line %}{% endfor %}
+            <p>{% for line in files['t'] %}{{ line }}</p>{% endfor %}
           {% endif %}
           <h3>The answer was endorsed with these comments:</h3> 
-          {% for line in files['e'] %}{% print line %}{% endfor %}
+          <p>{% for line in files['e'] %}{{ line }}</p>{% endfor %}
         {% else %}
           <h3>The answer was opposed with these comments:</h3> 
-          {% for line in files['o'] %}{% print line %}{% endfor %}
+          <p>{% for line in files['o'] %}{{ line }}</p>{% endfor %}
         {% endif %}
         <h3>Your implementation:</h3>
         <textarea name=resolution rows=5 cols=70></textarea>

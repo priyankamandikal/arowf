@@ -172,6 +172,30 @@ def recommend():
         flash('Thank you for the implementation.') # displays in layout.html
         return redirect(url_for('index'))
 
+def meanfn(v):
+    try:
+        result = ctime(sum(v)/len(v))
+    except:
+        result = 'none'
+        pass
+    return result
+
+def minfn(v):
+    try:
+        result = ctime(min(v))
+    except:
+        result = 'none'
+        pass
+    return result
+
+def maxfn(v):
+    try:
+        result = ctime(max(v))
+    except:
+        result = 'none'
+        pass
+    return result
+
 @app.route('/inspect', methods=['GET']) # optional: ?q=searchstring&r=reviewer
 def inspect():
     records = getrecords()
@@ -179,9 +203,9 @@ def inspect():
         flash('No questions in system.')
         return redirect(url_for('index'))
     filenums = records.keys()              # assuming contiguity can't delete
-    filemodtimes = []                      # all file modification times
+    filemodtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} #file modification times
     searchstring = request.args.get('q')   # search e.g. category in -q files
-    stringtimes = {'q':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
+    stringtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
     reviewer = request.args.get('r')       # search for reviewer in -a/e/o/t
     reviewtimes = {'a':[],'e':[],'o':[],'t':[]} # times for reviewer search
     reviewercount = 0                      # number of times reviewer appears
@@ -190,16 +214,18 @@ def inspect():
     for fn in filenums:
         stringhit = False                  # flag whether searchstring is seen
         if searchstring:
-            f = open(recdir + fn + 'q', 'r') # check question files
+            f = open(recdir + fn + 'qs', 'r') # check question files
             question = f.read()
             f.close()
             if searchstring in question:   # substring search
                 stringhit = True           # question has string
         for suffix in records[fn]:         # iterate over the files available
             modtime = path.getmtime(recdir + fn + suffix) # file modification
-            filemodtimes.append(modtime)
+            filemodtimes[suffix].append(modtime)
+            filemodtimes['all'].append(modtime)
             if stringhit:
                 stringtimes[suffix].append(modtime)
+                stringtimes['all'].append(modtime)
             if reviewer and suffix in ['a', 'e', 'o', 't']:
                 f = open(recdir + fn + suffix, 'r')
                 contents = f.read()        # look for the reviewer argument
@@ -217,21 +243,31 @@ def inspect():
                             revieweragree = revieweragree + 1
                         elif 'e' in records[fn]: # opposition rejected
                             reviewerdised = reviewerdised + 1
+    
+
     # summary statistics
-    count, first, last = len(records), min(filenums), max(filenums)
-    mindate, maxdate = min(filemodtimes), max(filemodtimes)
-    meandate = sum(filemodtimes) / len(filemodtimes)
+
+    count = {k:len(v) for k,v in filemodtimes.items()}
+    #count, first, last = len(records), min(filenums), max(filenums)
+    first, last = min(filenums), max(filenums)
+    mindate = {k:minfn(v) for k,v in filemodtimes.items()}
+    maxdate = {k:maxfn(v) for k,v in filemodtimes.items()}
+    meandate = {k:meanfn(v) for k,v in filemodtimes.items()}
+
+    stringcount = {k:len(v) for k,v in stringtimes.items()}
+    stringmindate = {k:minfn(v) for k,v in stringtimes.items()}
+    stringmaxdate = {k:maxfn(v) for k,v in stringtimes.items()}
+    stringmeandate = {k:meanfn(v) for k,v in stringtimes.items()}
+
     return render_template('inspect.html', count=count, first=first, 
-        last=last, mindate=ctime(mindate), maxdate=ctime(maxdate), 
-        meandate=ctime(meandate),
-        searchstring=searchstring, stringqs=stringtimes['qs'],
-        stringas=stringtimes['a'], stringes=stringtimes['e'],
-        stringos=stringtimes['o'], stringts=stringtimes['t'],
-        stringds=stringtimes['d'], reviewer=reviewer, 
-        revas=stringtimes['a'], reves=stringtimes['e'],
-        revos=stringtimes['o'], revts=stringtimes['t'],
-        reviewercount=reviewercount, revieweragree=revieweragree, 
-        reviewerdised=reviewerdised)
+        last=last, mindate=mindate, maxdate=maxdate, meandate=meandate,
+        searchstring=searchstring, stringcount=stringcount,
+        stringmindate=stringmindate,
+        stringmaxdate=stringmaxdate, stringmeandate=stringmeandate,
+        reviewer=reviewer, revas=stringtimes['a'], 
+        reves=stringtimes['e'],revos=stringtimes['o'], 
+        revts=stringtimes['t'],reviewercount=reviewercount, 
+        revieweragree=revieweragree, reviewerdised=reviewerdised)
 
 #@app.errorhandler(404)
 #def not_found(error):

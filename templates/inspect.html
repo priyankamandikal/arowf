@@ -13,27 +13,29 @@
 {% extends "layout.html" %}
 {% block body %}
   <h2>Summary statistics</h2>
-    <table>
-      <tr><td>Files:</td><td>{{ count }}</td></tr>
-      <tr><td>First:</td><td>{{ first }}</td></tr>
-      <tr><td>Last:</td><td>{{ last }}</td></tr>
-      <tr><td>Earliest:</td><td>{{ mindate }}</td></tr>
-      <tr><td>Latest:</td><td>{{ maxdate }}</td></tr>
-      <tr><td>Mean date:</td><td>{{ meandate }}</td></tr>
+    <table border="1">
+      <tr><th></th><th>all</th><th>qs</th><th>a</th><th>e</th><th>o</th><th>t</th><th>d</th></tr>
+      <tr><th>Count</th><td>{{ count['all'] }}</td><td>{{ count['qs'] }}</td><td>{{ count['a'] }}</td><td>{{ count['e'] }}</td><td>{{ count['o'] }}</td><td>{{ count['t'] }}</td><td>{{ count['d'] }}</td></tr>
+      <tr><th>First</th><td>{{ first }}</td></tr>
+      <tr><th>Last</th><td>{{ last }}</td></tr>
+      <tr><th>Earliest</th><td>{{ mindate['all'] }}</td><td>{{ mindate['qs'] }}</td><td>{{ mindate['a'] }}</td><td>{{ mindate['e'] }}</td><td>{{ mindate['o'] }}</td><td>{{ mindate['t'] }}</td><td>{{ mindate['d'] }}</td></tr>
+      <tr><th>Latest</th><td>{{ maxdate['all'] }}</td><td>{{ maxdate['qs'] }}</td><td>{{ maxdate['a'] }}</td><td>{{ maxdate['e'] }}</td><td>{{ maxdate['o'] }}</td><td>{{ maxdate['t'] }}</td><td>{{ maxdate['d'] }}</td></tr>
+      <tr><th>Mean date</th><td>{{ meandate['all'] }}</td><td>{{ meandate['qs'] }}</td><td>{{ meandate['a'] }}</td><td>{{ meandate['e'] }}</td><td>{{ meandate['o'] }}</td><td>{{ meandate['t'] }}</td><td>{{ meandate['d'] }}</td></tr>
     </table>
     {% if searchstring %}
-    <table>
-      <tr><td>?q=string search for:</td><td>{{ searchstring }}</td></tr>
-      <tr><td>-q files:</td><td>{{ stringqs|length }}</td></tr>
-      <tr><td>-a files:</td><td>{{ stringas|length }}</td></tr>
-      <tr><td>-e files:</td><td>{{ stringes|length }}</td></tr>
-      <tr><td>-o files:</td><td>{{ stringos|length }}</td></tr>
-      <tr><td>-t files:</td><td>{{ stringts|length }}</td></tr>
-      <tr><td>-d files:</td><td>{{ stringds|length }}</td></tr>
+    </br>
+    <h3>String search for: {{searchstring}}</h3>
+    <table border="1">
+      <tr><th></th><th>all</th><th>qs</th><th>a</th><th>e</th><th>o</th><th>t</th><th>d</th></tr>
+      <tr><th>Count</th><td>{{ stringcount['all'] }}</td><td>{{ stringcount['qs'] }}</td><td>{{ stringcount['a'] }}</td><td>{{ stringcount['e'] }}</td><td>{{ stringcount['o'] }}</td><td>{{ stringcount['t'] }}</td><td>{{ stringcount['d'] }}</td></tr>
+      <tr><th>Earliest</th><td>{{ stringmindate['all'] }}</td><td>{{ stringmindate['qs'] }}</td><td>{{ stringmindate['a'] }}</td><td>{{ stringmindate['e'] }}</td><td>{{ stringmindate['o'] }}</td><td>{{ stringmindate['t'] }}</td><td>{{ stringmindate['d'] }}</td></tr>
+      <tr><th>Latest</th><td>{{ stringmaxdate['all'] }}</td><td>{{ stringmaxdate['qs'] }}</td><td>{{ stringmaxdate['a'] }}</td><td>{{ stringmaxdate['e'] }}</td><td>{{ stringmaxdate['o'] }}</td><td>{{ stringmaxdate['t'] }}</td><td>{{ stringmaxdate['d'] }}</td></tr>
+      <tr><th>Mean date</th><td>{{ stringmeandate['all'] }}</td><td>{{ stringmeandate['qs'] }}</td><td>{{ stringmeandate['a'] }}</td><td>{{ stringmeandate['e'] }}</td><td>{{ stringmeandate['o'] }}</td><td>{{ stringmeandate['t'] }}</td><td>{{ stringmeandate['d'] }}</td></tr>
     </table>
     {% endif %}
     {% if reviewer %}
-    <table>
+    </br>
+    <table border="1">
       <tr><td>?r=reviewer search for:</td><td>{{ reviewer }}</td></tr>
       <tr><td>Total reviews:</td><td>{{ reviewercount }}</td></tr>
       <tr><td>Times agreed with:</td><td>{{ revieweragree }}</td></tr>
