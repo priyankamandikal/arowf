@@ -83,7 +83,7 @@ def ask():
             ### ... maybe try adding the process ID to end of fn and renaming?
         
         f = open(fn, 'w')
-        f.write(question+'\n') ### only add \n if not already at end? & below
+        f.write(iframeurl+'\n'+question+'\n') ### only add \n if not already at end? & below
         f.close()
         flash('Thanks for the question.')  # displays in layout.html
         return redirect(url_for('index'))  # GET /
