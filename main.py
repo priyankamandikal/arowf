@@ -204,9 +204,9 @@ def inspect():
         flash('No questions in system.')
         return redirect(url_for('index'))
     filenums = records.keys()              # assuming contiguity can't delete
-    filemodtimes = []                      # all file modification times
+    filemodtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} #file modification times
     searchstring = request.args.get('q')   # search e.g. category in -q files
-    stringtimes = {'q':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
+    stringtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
     reviewer = request.args.get('r')       # search for reviewer in -a/e/o/t
     reviewtimes = {'a':[],'e':[],'o':[],'t':[]} # times for reviewer search
     reviewercount = 0                      # number of times reviewer appears
@@ -215,16 +215,18 @@ def inspect():
     for fn in filenums:
         stringhit = False                  # flag whether searchstring is seen
         if searchstring:
-            f = open(recdir + fn + 'q', 'r') # check question files
+            f = open(recdir + fn + 'qs', 'r') # check question files
             question = f.read()
             f.close()
             if searchstring in question:   # substring search
                 stringhit = True           # question has string
         for suffix in records[fn]:         # iterate over the files available
             modtime = path.getmtime(recdir + fn + suffix) # file modification
-            filemodtimes.append(modtime)
+            filemodtimes[suffix].append(modtime)
+            filemodtimes['all'].append(modtime)
             if stringhit:
                 stringtimes[suffix].append(modtime)
+                stringtimes['all'].append(modtime)
             if reviewer and suffix in ['a', 'e', 'o', 't']:
                 f = open(recdir + fn + suffix, 'r')
                 contents = f.read()        # look for the reviewer argument
@@ -241,7 +243,7 @@ def inspect():
                         if 'o' in records[fn]:   # opposition agreed to
                             revieweragree = revieweragree + 1
                         elif 'e' in records[fn]: # opposition rejected
-                            reviewerdised = reviewerdised + 1
+
 
     # summary statistics
     count, first, last = len(records), min(filenums), max(filenums)
@@ -272,6 +274,7 @@ def inspect():
         revieweragree=revieweragree, reviewerdised=reviewerdised, \
         ratio='%2.0f%%' % \
                ((revieweragree+0.0 / (reviewerdised + revieweragree)) * 100))
+
 #@app.errorhandler(404)
 #def not_found(error):
 #    return render_template('error.html'), 404
