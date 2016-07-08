@@ -1,29 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-
-	<head>
-	<script type="text/javascript">
-		function LoadIFrame(){
-			var iframe = document.getElementById("iframeobj");
-			iframe.src = document.getElementById("iframeurl").value;
-		}
-	</script>
-	</head>
-
-
-
-    <form action="{{ url_for('ask') }}" method=post>{# class=? for css? #}
-      <h2>Please ask a question.</h2>
-        <h3>Your question:</h3>
-        <textarea id="question"  name=question rows=5 cols=70 style="width:50%"></textarea>
-        <br/>
-        <h3>Add an optional URL to support your question</h3>
-        <input id="iframeurl" type=text name=iframeurl placeholder="Paste the relevant article url, diff or permalink" style="width:45%" />
-        <input type=button value=Go onclick="LoadIFrame(); return False;" style="width:4%" />
-        <br/>
-        <iframe id="iframeobj" name=iframeobj src="" style="height:150%;width:50%"></iframe>
-        <br/>
-        <br/>
-        <input type=submit value=Ask />
-    </form>
+  <form action="{{ url_for('ask') }}" method=post>
+    <h2>Ask a question:</h2>
+      <textarea name=question style="width: 80%; height: 15%;"></textarea>
+      <br/>
+      <h3>Optionally add a pertinent web page (e.g. diff or permalink):</h3>
+      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
+             style="width: 70%;" />
+      <input type=button value=Preview onclick="LoadIframe(); return False;" />
+      <input type=submit value=Ask />
+  </form>
+  <iframe id=iframeobj style="display: none; height: 40%; width: 100%;"
+          ></iframe>
 {% endblock %}

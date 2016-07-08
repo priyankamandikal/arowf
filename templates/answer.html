@@ -9,72 +9,61 @@
      record = request.form['record']     # file number with zeroes
      response = request.form['response'] # [submit button] 1 of: a,e,o,te,to
      answer = request.form['answer']     # text (maybe audio someday)
+
 #}
 {% extends "layout.html" %}
 {% block body %}
-
+  <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
   {% if response == 'a' %}
-    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
-      <h2>Please answer this question.</h2>
-        <h3>Question:</h3>
-        {% if 'qs' in files %}
-          <p>The article <a href={{files['qs'][2]}}><b>{{ files['qs'][1]|safe }}</b></a> is in {{ files['qs'][0]|safe }}. How would you update it?</p>
-          <br/>
-          <iframe name=iframeobj src={{ files['qs'][2]|safe }} style="height:250px;width:100%"></iframe>
-        {% elif 'qu' in files %}
-          <p>{% for line in files['qu'][1:] %}{{ line|safe }}</p>{% endfor %}
-          <iframe name=iframeobj src={{files['qu'][0]|safe}} style="height:250px;width:100%"></iframe>
-        {% endif %}
-        <h3>Your answer:</h3>
-        <textarea name=answer rows=5 cols=70></textarea>
-        <br />
-        <button type=submit name=response value=a>Answer</button>
-        <input type=hidden name=record value={{ record }} />
-    </form>
+    <h2>Please answer this question.</h2>
+      <h3>Question:</h3>
+      {{ files['q']|safe }}
+      <h3>Your answer:</h3>
+      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
+      <br/>
+      <h3>Optionally add a pertinent web page:</h3>
+      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
+             style="width: 70%;" />
+      <input type=button value=Preview onclick="LoadIframe(); return False;" />
+      <button type=submit name=response value=a>Answer</button>
+      <input type=hidden name=record value={{ record }} />
   {% elif response == 'r' %}
-    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
-      <h2>Please review the proposed answer to this question.</h2>
-        <h3>Question:</h3>
-        {% if 'qs' in files %}
-          <p>The article <a href={{files['qs'][2]}}><b>{{ files['qs'][1]|safe }}</b></a> is in {{ files['qs'][0]|safe }}. How would you update it?</p>
-          <br/>
-          <iframe name=iframeobj src={{ files['qs'][2]|safe }} style="height:250px;width:100%"></iframe>
-        {% elif 'qu' in files %}
-          <p>{% for line in files['qu'][1:] %}{{ line|safe }}</p>{% endfor %}
-          <iframe name=iframeobj src={{files['qu'][0]|safe}} style="height:250px;width:100%"></iframe>
-        {% endif %}
-        <h3>Proposed answer:</h3> 
-        <p>{% for line in files['a'] %}{{ line|safe }}</p>{% endfor %}
-        <h3>Your comments:</h3>
-        <textarea name=answer rows=5 cols=70></textarea>
-        <br />
-        <button type=submit name=response value=e>Endorse proposed answer</button>
-        <button type=submit name=response value=o>Oppose proposed answer</button>
-        <input type=hidden name=record value={{ record }} />
-    </form>
+    <h2>Please review the proposed answer to this question.</h2>
+      <h3>Question:</h3>
+      {{ files['q']|safe }}
+      <h3>Proposed answer:</h3> 
+      {{ files['a']|safe }}
+      <h3>Your comments:</h3>
+      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
+      <br/>
+      <h3>Optionally add a pertinent web page:</h3>
+      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
+             style="width: 40%;" />
+      <input type=button value=Preview onclick="LoadIframe(); return False;" />
+      <button type=submit name=response value=e>Endorse proposed answer</button>
+      <button type=submit name=response value=o>Oppose proposed answer</button>
+      <input type=hidden name=record value={{ record }} />
   {% elif response == 't' %}
-    <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
-      <h2>Please decide between this question's proposed answer and opposing comments.</h2>
-        <h3>Question:</h3> 
-        {% if 'qs' in files %}
-          <p>The article <a href={{files['qs'][2]}}><b>{{ files['qs'][1]|safe }}</b></a> is in {{ files['qs'][0]|safe }}. How would you update it?</p>
-          <br/>
-          <iframe name=iframeobj src={{ files['qs'][2]|safe }} style="height:250px;width:100%"></iframe>
-        {% elif 'qu' in files %}
-          <p>{% for line in files['qu'][1:] %}{{ line|safe }}</p>{% endfor %}
-          <iframe name=iframeobj src={{files['qu'][0]|safe}} style="height:250px;width:100%"></iframe>
-        {% endif %}
-        <h3>Proposed answer:</h3> 
-        <p>{% for line in files['a'] %}{{ line|safe }}</p>{% endfor %}
-        <h3>Comments opposing that proposed answer:</h3> 
-        <p>{% for line in files['o'] %}{{ line|safe }}</p>{% endfor %}
-        <h3>Your comments:</h3>
-        <textarea name=answer rows=5 cols=70></textarea>
-        <br />
-        <button type=submit name=response value=te>Endorse proposed answer</button>
-        <button type=submit name=response value=to>Oppose proposed answer</button>
-        <input type=hidden name=record value={{ record }} />
-    </form>
+    <h2>Please decide between this question's proposed answer and opposing comments.</h2>
+      <h3>Question:</h3> 
+      {{ files['q']|safe }}
+      <h3>Proposed answer:</h3> 
+      {{ files['a']|safe }}
+      <h3>Comments opposing that proposed answer:</h3> 
+      {{ files['o']|safe }}
+      <h3>Your comments:</h3>
+      <textarea name=answer  style="width: 80%; height: 15%;"></textarea>
+      <br/>
+      <h3>Optionally add a pertinent web page:</h3>
+      <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
+             style="width: 40%;" />
+      <input type=button value=Preview onclick="LoadIframe(); return False;" />
+      <button type=submit name=response value=te>Endorse proposed answer</button>
+      <button type=submit name=response value=to>Oppose proposed answer</button>
+      <input type=hidden name=record value={{ record }} />
   {% endif %}
+  </form>
+  <iframe id=iframeobj name=iframeobj 
+          style="display: none; height: 40%; width: 100%;"></iframe>
 {% endblock %}
 

@@ -1,11 +1,27 @@
 {# inspect.html template (GET only, no POSTs)
 
    parameters:
-        count, first, last, mindate, maxdate, meandate,
-        searchstring, stringqs[], stringas[], stringes[],
-                      stringos[], stringts[], stringds[], 
-        reviewer, revas[], reves[], revos[], revts[],
-                  reviewercount, revieweragree, reviewerdised
+        count, first, last,
+        mindate=ctime(mindate), maxdate=ctime(maxdate), 
+        meandate=ctime(meandate),
+        searchstring, 
+        stringqs=len(stringtimes['q']), 
+        sqmn=mintime(stringtimes['q']), sqmx=maxtime(stringtimes['q']),
+        stringas=len(stringtimes['a']), 
+        samn=mintime(stringtimes['a']), samx=maxtime(stringtimes['a']),
+        stringes=len(stringtimes['e']),
+        semn=mintime(stringtimes['e']), semx=maxtime(stringtimes['e']),
+        stringos=len(stringtimes['o']), 
+        somn=mintime(stringtimes['o']), somx=maxtime(stringtimes['o']),
+        stringts=len(stringtimes['t']),
+        stmn=mintime(stringtimes['t']), stmx=maxtime(stringtimes['t']),
+        stringds=len(stringtimes['d']), 
+        sdmn=mintime(stringtimes['d']), sdmx=maxtime(stringtimes['d']),
+        reviewer, 
+        revas=len(stringtimes['a']), 
+        reves=len(stringtimes['e']), revos=len(stringtimes['o']),
+        revts=len(stringtimes['t']), reviewercount=reviewercount, 
+        revieweragree=revieweragree, reviewerdised=reviewerdised
 
                   displays revieweragree/(reviewerdised+revieweragree)
                   as a percent ratio if its denominator is positive
@@ -13,42 +29,54 @@
 {% extends "layout.html" %}
 {% block body %}
   <h2>Summary statistics</h2>
-    <table border="1">
-      <tr><th></th><th>all</th><th>qs</th><th>a</th><th>e</th><th>o</th><th>t</th><th>d</th></tr>
-      <tr><th>Count</th><td>{{ count['all'] }}</td><td>{{ count['qs'] }}</td><td>{{ count['a'] }}</td><td>{{ count['e'] }}</td><td>{{ count['o'] }}</td><td>{{ count['t'] }}</td><td>{{ count['d'] }}</td></tr>
-      <tr><th>First</th><td>{{ first }}</td></tr>
-      <tr><th>Last</th><td>{{ last }}</td></tr>
-      <tr><th>Earliest</th><td>{{ mindate['all'] }}</td><td>{{ mindate['qs'] }}</td><td>{{ mindate['a'] }}</td><td>{{ mindate['e'] }}</td><td>{{ mindate['o'] }}</td><td>{{ mindate['t'] }}</td><td>{{ mindate['d'] }}</td></tr>
-      <tr><th>Latest</th><td>{{ maxdate['all'] }}</td><td>{{ maxdate['qs'] }}</td><td>{{ maxdate['a'] }}</td><td>{{ maxdate['e'] }}</td><td>{{ maxdate['o'] }}</td><td>{{ maxdate['t'] }}</td><td>{{ maxdate['d'] }}</td></tr>
-      <tr><th>Mean date</th><td>{{ meandate['all'] }}</td><td>{{ meandate['qs'] }}</td><td>{{ meandate['a'] }}</td><td>{{ meandate['e'] }}</td><td>{{ meandate['o'] }}</td><td>{{ meandate['t'] }}</td><td>{{ meandate['d'] }}</td></tr>
+    <table>
+      <tr><th>Files:</th><td>{{ count }}</td></tr>
+      <tr><th>First:</th><td>{{ first }}</td></tr>
+      <tr><th>Last:</th><td>{{ last }}</td></tr>
+      <tr><th>Earliest:</th><td>{{ mindate }}</td></tr>
+      <tr><th>Latest:</th><td>{{ maxdate }}</td></tr>
+      <tr><th>Mean date:</th><td>{{ meandate }}</td></tr>
     </table>
     {% if searchstring %}
-    </br>
-    <h3>String search for: {{searchstring}}</h3>
-    <table border="1">
-      <tr><th></th><th>all</th><th>qs</th><th>a</th><th>e</th><th>o</th><th>t</th><th>d</th></tr>
-      <tr><th>Count</th><td>{{ stringcount['all'] }}</td><td>{{ stringcount['qs'] }}</td><td>{{ stringcount['a'] }}</td><td>{{ stringcount['e'] }}</td><td>{{ stringcount['o'] }}</td><td>{{ stringcount['t'] }}</td><td>{{ stringcount['d'] }}</td></tr>
-      <tr><th>Earliest</th><td>{{ stringmindate['all'] }}</td><td>{{ stringmindate['qs'] }}</td><td>{{ stringmindate['a'] }}</td><td>{{ stringmindate['e'] }}</td><td>{{ stringmindate['o'] }}</td><td>{{ stringmindate['t'] }}</td><td>{{ stringmindate['d'] }}</td></tr>
-      <tr><th>Latest</th><td>{{ stringmaxdate['all'] }}</td><td>{{ stringmaxdate['qs'] }}</td><td>{{ stringmaxdate['a'] }}</td><td>{{ stringmaxdate['e'] }}</td><td>{{ stringmaxdate['o'] }}</td><td>{{ stringmaxdate['t'] }}</td><td>{{ stringmaxdate['d'] }}</td></tr>
-      <tr><th>Mean date</th><td>{{ stringmeandate['all'] }}</td><td>{{ stringmeandate['qs'] }}</td><td>{{ stringmeandate['a'] }}</td><td>{{ stringmeandate['e'] }}</td><td>{{ stringmeandate['o'] }}</td><td>{{ stringmeandate['t'] }}</td><td>{{ stringmeandate['d'] }}</td></tr>
+    <table>
+      <tr><th>Question search for:</th><th>{{ searchstring }}</th>
+          <th>Earliest</th><th>Latest</th></tr>
+      <tr><td>-q files:</td><td>{{ stringqs }}</td>
+          <td>{{ sqmn }}</td><td>{{ sqmx }}</td></tr>
+      <tr><td>-a files:</td><td>{{ stringas }}</td>
+          <td>{{ samn }}</td><td>{{ samx }}</td></tr>
+      <tr><td>-e files:</td><td>{{ stringes }}</td>
+          <td>{{ semn }}</td><td>{{ semx }}</td></tr>
+      <tr><td>-o files:</td><td>{{ stringos }}</td>
+          <td>{{ somn }}</td><td>{{ somx }}</td></tr>
+      <tr><td>-t files:</td><td>{{ stringts }}</td>
+          <td>{{ stmn }}</td><td>{{ stmx }}</td></tr>
+      <tr><td>-d files:</td><td>{{ stringds }}</td>
+          <td>{{ sdmn }}</td><td>{{ sdmx }}</td></tr>
     </table>
     {% endif %}
     {% if reviewer %}
-    </br>
-    <table border="1">
-      <tr><td>?r=reviewer search for:</td><td>{{ reviewer }}</td></tr>
+    <table>
+      <tr><th>Reviewer search for:</th><th>{{ reviewer }}</th></tr>
       <tr><td>Total reviews:</td><td>{{ reviewercount }}</td></tr>
       <tr><td>Times agreed with:</td><td>{{ revieweragree }}</td></tr>
       <tr><td>Times disagreed with:</td><td>{{ reviewerdised }}</td></tr>
       {% if revieweragree + reviewerdised > 0 %}
-        <tr><td>Agreement ratio:</td><td>{{ '%2.0f' % 
-        (revieweragree/(reviewerdised+revieweragree))/100.0 }}%</td></tr>
+        <tr><td>Agreement ratio:</td><td>{{ ratio }}</td></tr>
       {% endif %}
-      <tr><td>-a files:</td><td>{{ revas|length }}</td></tr>
-      <tr><td>-e files:</td><td>{{ reves|length }}</td></tr>
-      <tr><td>-o files:</td><td>{{ revos|length }}</td></tr>
-      <tr><td>-t files:</td><td>{{ revts|length }}</td></tr>
+      <tr><td>-a files:</td><td>{{ revas }}</td></tr>
+      <tr><td>-e files:</td><td>{{ reves }}</td></tr>
+      <tr><td>-o files:</td><td>{{ revos }}</td></tr>
+      <tr><td>-t files:</td><td>{{ revts }}</td></tr>
     </table>
     {% endif %}
+  <form action="{{ url_for('inspect') }}" method=get>
+  Question search for: <input type=text name=q />
+  <input type=submit value=Search />
+  </form>
+  <form action="{{ url_for('inspect') }}" method=get>
+  Reviewer search for: <input type=text name=r />
+  <input type=submit value=Search />
+  </form>
 {% endblock %}
 

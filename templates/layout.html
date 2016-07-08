@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+<<<<<<< HEAD
 <title>Minireview review system for arowf.org</title>
 <link rel=stylesheet type=text/css
  href="{{ url_for('static', filename='style.css') }}">
@@ -11,3 +12,25 @@
 	{% block body %}{% endblock %}
 </div>
 </html>
+=======
+  <head>
+  <title>Minireview review system for arowf.org</title>
+  <link rel=stylesheet type=text/css
+   href="{{ url_for('static', filename='style.css') }}">
+  <script type="text/javascript">
+    function LoadIframe() {
+      var ifr = document.getElementById('iframeobj');
+      ifr.src = document.getElementById('iframeurl').value;
+      ifr.style.display = 'block';
+    }
+  </script>
+  </head>
+  <body>
+    <h1>Minireview</h1>
+    {% for message in get_flashed_messages() %}
+      <div class=flash>{{ message }}</div>
+    {% endfor %}
+    {% block body %}{% endblock %}
+  </body>
+</html>
+>>>>>>> v0.6a
