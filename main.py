@@ -21,6 +21,7 @@ recdir = 'records' + path.sep                     # data subdirectory
 
 urlregex = compile(r'((https|ftp|http)://(((?!</p>| )).)*)')
 ###@@@ make sure this handles unicode and parens
+
 app = Flask(__name__) # create Flask WSGI application
 
 app.secret_key = 'enable flash() session cookies' # does what that says
@@ -81,9 +82,8 @@ def ask():
             return redirect(url_for('index'))          # GET /
             ### RACE condition if two people call nextrecord() simultaniously
             ### ... maybe try adding the process ID to end of fn and renaming?
-        
         f = open(fn, 'w')
-        f.write(iframeurl+'\n'+question+'\n') ### only add \n if not already at end? & below
+        f.write(question+'\n') ### only add \n if not already at end? & below
         f.close()
         flash('Thanks for the question.')  # displays in layout.html
         return redirect(url_for('index'))  # GET /
@@ -92,9 +92,9 @@ def getrecords():
     records = {} # use a dictionary of file numbers to lists of suffixes
     for fn in listdir(recdir):             ### handle bad filenames
         if not fn[0:9] in records:
-            records[fn[0:9]] = [fn[9:]]     # create file number's initial list
+            records[fn[0:9]] = [fn[9]]     # create file number's initial list
         else:
-            records[fn[0:9]].append(fn[9:]) # add file suffix to list
+            records[fn[0:9]].append(fn[9]) # add file suffix to list
     return records
 
 @app.route('/answer', methods=['GET', 'POST'])
@@ -115,12 +115,11 @@ def answer():
             flash('No open questions remaining to answer or review.')
             return redirect(url_for('index'))
         chosen = choice(selected.keys())    # pick a question at random
-        ### convert to round-robin instead of random choice
         needs = selected[chosen]            # type of response needed
         files = {}                          # files' contents in a suffix
         for suffix in records[chosen]:      # iterate over the files available
             f = open(recdir + chosen + suffix, 'r')
-            files[suffix] = f.readlines()        # read textual contents of each
+            files[suffix] = f.read()        # read textual contents of each
             f.close()
         return render_template('answer.html', record=chosen, response=needs,
                                files=files) # invoke the template
@@ -166,7 +165,7 @@ def recommend():
         files = {}                              # to map file suffixes to text
         for suffix in suffixes:                 # iterate over available files
             f = open(recdir + selection + suffix, 'r')
-            files[suffix] = f.readlines()            # read textual contents of each
+            files[suffix] = f.read()            # read textual contents of each
             f.close()
         return render_template('recommend.html', record=selection, files=files) 
     elif request.method == 'POST':
@@ -204,9 +203,9 @@ def inspect():
         flash('No questions in system.')
         return redirect(url_for('index'))
     filenums = records.keys()              # assuming contiguity can't delete
-    filemodtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} #file modification times
+    filemodtimes = []                      # all file modification times
     searchstring = request.args.get('q')   # search e.g. category in -q files
-    stringtimes = {'all':[],'qs':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
+    stringtimes = {'q':[],'a':[],'e':[],'o':[],'t':[],'d':[]} # searchstring
     reviewer = request.args.get('r')       # search for reviewer in -a/e/o/t
     reviewtimes = {'a':[],'e':[],'o':[],'t':[]} # times for reviewer search
     reviewercount = 0                      # number of times reviewer appears
@@ -215,18 +214,16 @@ def inspect():
     for fn in filenums:
         stringhit = False                  # flag whether searchstring is seen
         if searchstring:
-            f = open(recdir + fn + 'qs', 'r') # check question files
+            f = open(recdir + fn + 'q', 'r') # check question files
             question = f.read()
             f.close()
             if searchstring in question:   # substring search
                 stringhit = True           # question has string
         for suffix in records[fn]:         # iterate over the files available
             modtime = path.getmtime(recdir + fn + suffix) # file modification
-            filemodtimes[suffix].append(modtime)
-            filemodtimes['all'].append(modtime)
+            filemodtimes.append(modtime)
             if stringhit:
                 stringtimes[suffix].append(modtime)
-                stringtimes['all'].append(modtime)
             if reviewer and suffix in ['a', 'e', 'o', 't']:
                 f = open(recdir + fn + suffix, 'r')
                 contents = f.read()        # look for the reviewer argument
@@ -243,8 +240,7 @@ def inspect():
                         if 'o' in records[fn]:   # opposition agreed to
                             revieweragree = revieweragree + 1
                         elif 'e' in records[fn]: # opposition rejected
-
-
+                            reviewerdised = reviewerdised + 1
     # summary statistics
     count, first, last = len(records), min(filenums), max(filenums)
     mindate, maxdate = min(filemodtimes), max(filemodtimes)
@@ -281,9 +277,8 @@ def inspect():
 
 if __name__ == '__main__':
     app.run(
-      use_reloader = True # reloads this source file when changed # runs on http://127.0.0.1:5000/
-
+      use_reloader = True # reloads this source file when changed
     ## , use_debugger=True # see http://flask.pocoo.org/docs/0.11/errorhandling/
+           )                    # runs on http://127.0.0.1:5000/
 
 # end
-
