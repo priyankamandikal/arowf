@@ -241,6 +241,8 @@ def inspect():
                             revieweragree = revieweragree + 1
                         elif 'e' in records[fn]: # opposition rejected
                             reviewerdised = reviewerdised + 1
+
+    denom = reviewerdised + revieweragree
     # summary statistics
     count, first, last = len(records), min(filenums), max(filenums)
     mindate, maxdate = min(filemodtimes), max(filemodtimes)
@@ -269,7 +271,7 @@ def inspect():
         revts=len(stringtimes['t']), reviewercount=reviewercount, \
         revieweragree=revieweragree, reviewerdised=reviewerdised, \
         ratio='%2.0f%%' % \
-               ((revieweragree+0.0 / (reviewerdised + revieweragree)) * 100))
+               ((revieweragree+0.0 / denom) * 100) if denom else 'n/a')
 
 #@app.errorhandler(404)
 #def not_found(error):
@@ -278,7 +280,8 @@ def inspect():
 if __name__ == '__main__':
     app.run(
       use_reloader = True # reloads this source file when changed
-    ## , use_debugger=True # see http://flask.pocoo.org/docs/0.11/errorhandling/
+     , use_debugger=True
+     , debug = True # see http://flask.pocoo.org/docs/0.11/errorhandling/
            )                    # runs on http://127.0.0.1:5000/
 
 # end
