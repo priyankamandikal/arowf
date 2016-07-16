@@ -9,30 +9,30 @@
      resolution = request.form['resolution'] # implementation, e.g. diff URL
 #}
 {% extends "layout.html" %}
-{% block body %}
+{% block page_content %}
   <form action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
-    <h2>Please implement this recommendation.</h2>
-      <h3>Question:</h3> 
+    <h3>Please implement this recommendation.</h3>
+      <h4>Question:</h4> 
       {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
+      <h4>Proposed answer:</h4> 
       {{ files['a']|safe }}
       {% if files ['e'] is defined %}
         {% if files ['t'] is defined %}
-          <h2>That answer had initially been opposed with these comments:</h2> 
+          <h3>That answer had initially been opposed with these comments:</h3> 
           {{ files['t']|safe }}
         {% endif %}
-        <h2>The answer was endorsed with these comments:</h2> 
+        <h3>The answer was endorsed with these comments:</h3> 
         {{ files['e']|safe }}
       {% else %}
-        <h2>The answer had initially been opposed with these comments:</h2> 
+        <h3>The answer had initially been opposed with these comments:</h3> 
         {{ files['t']|safe }}
-        <h2>The answer was finally opposed with these comments:</h2> 
+        <h3>The answer was finally opposed with these comments:</h3> 
         {{ files['o']|safe }}
       {% endif %}
-      <h3>Your implementation:</h3>
+      <h4>Your implementation:</h4>
       <textarea name=resolution  style="width: 80%; height: 15%;"></textarea>
     <br/>
-    <h3>Optionally add a pertinent web page (e.g. diff or permalink):</h3>
+    <h4>Optionally add a pertinent web page (e.g. diff or permalink):</h4>
     <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
            style="width: 70%;" />
     <input type=button value=Preview onclick="LoadIframe(); return False;" />

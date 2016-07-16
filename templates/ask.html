@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
-{% block body %}
+{% block page_content %}
   <form action="{{ url_for('ask') }}" method=post>
-    <h2>Ask a question:</h2>
+    <h3>Ask a question:</h3>
       <textarea name=question style="width: 80%; height: 15%;"></textarea>
       <br/>
-      <h3>Optionally add a pertinent web page (e.g. diff or permalink):</h3>
+      <h4>Optionally add a pertinent web page (e.g. diff or permalink):</h4>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
              style="width: 70%;" />
       <input type=button value=Preview onclick="LoadIframe(); return False;" />

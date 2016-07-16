@@ -22,19 +22,24 @@ if __name__ == '__main__':
 	try:
 		r = requests.get(url)
 		bs = BeautifulSoup(r.text)
+		cnt = 0;
 		for catgroup in bs.find_all('div', 'mw-category-group'):
 			for entry in catgroup.find_all('li'):
 				a = entry.find('a')
 				link = 'https://en.wikipedia.org' + a.get('href')
 				title = a.get('title').encode('utf8')
-				fn = recdir + nextrecord() + 'qs'
+				fn = recdir + nextrecord() + 'q'
 				print fn
 				if path.exists(fn):
 					print('A billion questions reached! Answer!')
 					exit()
 				f = open(fn, 'w')
-				f.write(categ + '\n' + title + '\n' + link +'\n')	# in file, print <backlog category>, <title>, <link>
+				f.write('The article <a href="' + link + '">' + title + '</a> is in ' + categ + '.</br>How would you update it?<br/><iframe src="' + link + '" align=right style="height: 40%; width: 80%;">[Can not display <a href="' + link + '">' + link + '</a> inline as an iframe here.]</iframe>')
+				#f.write(categ + '\n' + title + '\n' + link +'\n')	# in file, print <backlog category>, <title>, <link>
 				f.close()
+				cnt = cnt+1
+				if(cnt==5):
+					exit()
 
 	except:
 		print "Error while parsing backlogs"

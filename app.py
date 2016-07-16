@@ -12,6 +12,7 @@
 """
 
 from flask import Flask, render_template, redirect, url_for, request, flash
+from flask.ext.bootstrap import Bootstrap
 from os import listdir, rename, path # for path.sep, .exists() & .getmtime()
 from random import choice
 from time import ctime
@@ -23,6 +24,8 @@ urlregex = compile(r'((https|ftp|http)://(((?!</p>| )).)*)')
 ###@@@ make sure this handles unicode and parens
 
 app = Flask(__name__) # create Flask WSGI application
+
+bootstrap = Bootstrap(app) # create Bootstrap instance
 
 app.secret_key = 'enable flash() session cookies' # does what that says
 

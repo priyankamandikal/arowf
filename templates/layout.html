@@ -1,9 +1,11 @@
-<!doctype html>
-<html>
-  <head>
-  <title>Minireview review system for arowf.org</title>
-  <link rel=stylesheet type=text/css
-   href="{{ url_for('static', filename='style.css') }}">
+{% extends "bootstrap/base.html" %}
+
+{% block title %}
+  Minireview review system for arowf.org
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
   <script type="text/javascript">
     function LoadIframe() {
       var ifr = document.getElementById('iframeobj');
@@ -11,12 +13,30 @@
       ifr.style.display = 'block';
     }
   </script>
-  </head>
-  <body>
-    <h1>Minireview</h1>
-    {% for message in get_flashed_messages() %}
-      <div class=flash>{{ message }}</div>
-    {% endfor %}
-    {% block body %}{% endblock %}
-  </body>
-</html>
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Minireview</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  <div class="container">
+    {% block page_content %}{% endblock %}
+  </div>
+{% endblock %}

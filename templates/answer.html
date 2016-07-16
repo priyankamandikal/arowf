@@ -12,31 +12,31 @@
 
 #}
 {% extends "layout.html" %}
-{% block body %}
+{% block page_content %}
   <form action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
   {% if response == 'a' %}
-    <h2>Please answer this question.</h2>
-      <h3>Question:</h3>
+    <h3>Please answer this question.</h3>
+      <h4>Question:</h4>
       {{ files['q']|safe }}
-      <h3>Your answer:</h3>
+      <h4>Your answer:</h4>
       <textarea name=answer style="width: 80%; height: 15%;"></textarea>
       <br/>
-      <h3>Optionally add a pertinent web page:</h3>
+      <h4>Optionally add a pertinent web page:</h4>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
              style="width: 70%;" />
       <input type=button value=Preview onclick="LoadIframe(); return False;" />
       <button type=submit name=response value=a>Answer</button>
       <input type=hidden name=record value={{ record }} />
   {% elif response == 'r' %}
-    <h2>Please review the proposed answer to this question.</h2>
-      <h3>Question:</h3>
+    <h3>Please review the proposed answer to this question.</h3>
+      <h4>Question:</h4>
       {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
+      <h4>Proposed answer:</h4> 
       {{ files['a']|safe }}
-      <h3>Your comments:</h3>
+      <h4>Your comments:</h4>
       <textarea name=answer style="width: 80%; height: 15%;"></textarea>
       <br/>
-      <h3>Optionally add a pertinent web page:</h3>
+      <h4>Optionally add a pertinent web page:</h4>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
              style="width: 40%;" />
       <input type=button value=Preview onclick="LoadIframe(); return False;" />
@@ -44,17 +44,17 @@
       <button type=submit name=response value=o>Oppose proposed answer</button>
       <input type=hidden name=record value={{ record }} />
   {% elif response == 't' %}
-    <h2>Please decide between this question's proposed answer and opposing comments.</h2>
-      <h3>Question:</h3> 
+    <h3>Please decide between this question's proposed answer and opposing comments.</h3>
+      <h4>Question:</h4> 
       {{ files['q']|safe }}
-      <h3>Proposed answer:</h3> 
+      <h4>Proposed answer:</h4> 
       {{ files['a']|safe }}
-      <h3>Comments opposing that proposed answer:</h3> 
+      <h4>Comments opposing that proposed answer:</h4> 
       {{ files['o']|safe }}
-      <h3>Your comments:</h3>
+      <h4>Your comments:</h4>
       <textarea name=answer  style="width: 80%; height: 15%;"></textarea>
       <br/>
-      <h3>Optionally add a pertinent web page:</h3>
+      <h4>Optionally add a pertinent web page:</h4>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
              style="width: 40%;" />
       <input type=button value=Preview onclick="LoadIframe(); return False;" />
