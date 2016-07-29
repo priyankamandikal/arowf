@@ -4,6 +4,7 @@ import traceback
 from os import path, listdir
 import sys
 
+# to access functions from python files in another directory
 sys.path.insert(0,'/home/priyanka/Documents/Wikipedia_Accuracy_Review/wikiwho_api/wikiwho_api')
 
 from wikiwho_api_api import mainFunction
