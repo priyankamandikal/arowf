@@ -28,7 +28,7 @@
 #}
 {% extends "layout.html" %}
 {% block page_content %}
-  <h3>Summary statistics</h3>
+  <h3 clear=all>Summary statistics</h3 clear=all>
     <table>
       <tr><th>Files:</th><td>{{ count }}</td></tr>
       <tr><th>First:</th><td>{{ first }}</td></tr>
@@ -70,11 +70,11 @@
       <tr><td>-t files:</td><td>{{ revts }}</td></tr>
     </table>
     {% endif %}
-  <form action="{{ url_for('inspect') }}" method=get>
+  <form autocomplete="off" action="{{ url_for('inspect') }}" method=get>
   Question search for: <input type=text name=q />
   <input type=submit value=Search />
   </form>
-  <form action="{{ url_for('inspect') }}" method=get>
+  <form autocomplete="off" action="{{ url_for('inspect') }}" method=get>
   Reviewer search for: <input type=text name=r />
   <input type=submit value=Search />
   </form>

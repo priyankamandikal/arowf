@@ -10,6 +10,10 @@
 ###: introduces comments that involve lower-priority work to be done
 """
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask.ext.bootstrap import Bootstrap
 from os import listdir, rename, path # for path.sep, .exists() & .getmtime()
@@ -64,11 +68,11 @@ def frameurl(url):
     if match(urlregex, url):
         qurl = url.replace('"', '%22') # hexify quotation marks
         # if so, return indented html to display it as an iframe
-        return '\n\n<br clear=all />\n<iframe src="' + qurl \
+        return '\n\n<br/>\n<iframe src="' + qurl \
                 + '" align=right style="height: 40%; width: 80%;">' \
                 + '[Can not display <a href="' + qurl + '">' + qurl \
                 + '</a> inline as an iframe here.]</iframe>i' \
-                + '<br clear=all \>\n'
+                + '<br\>\n'
     else:
         return ''
 
@@ -232,7 +236,7 @@ def inspect():
             f = open(recdir + fn + 'q', 'r') # check question files
             question = f.read()
             f.close()
-            if searchstring in question:   # substring search
+            if searchstring.lower() in question.lower():   # substring search
                 stringhit = True           # question has string
         for suffix in records[fn]:         # iterate over the files available
             modtime = path.getmtime(recdir + fn + suffix) # file modification
@@ -314,7 +318,7 @@ def inspect():
 # No cache
 @app.after_request
 def add_header(response):
-    response.headers['Cache-Control'] = 'no-store, must-revalidate'
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
 if __name__ == '__main__':

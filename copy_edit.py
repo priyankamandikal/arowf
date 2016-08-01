@@ -72,7 +72,7 @@ def flesch_kincaid_score(article):
 	bs = BeautifulSoup(xml)
 	try:
 		text = str(bs.find('extract').contents[0].encode('utf-8'))	# convert NavigableString to string after encoding
-		non_text = ['== See also ==\n', '== References ==\n', ' === Further references ===\n', '== External links ==\n']
+		non_text = ['== See also ==\n', '== References ==\n', ' === Further references ===\n', '== External links ==\n', '== Notes ==\n']
 		for ele in non_text:
 			text = text.split(ele, 1)[0]
 		text = re.sub('==.*==', '', text)
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 			print('A billion questions reached! Answer!')
 			exit()
 		f = open(fn, 'w')
-		f.write('The article <a href="' + i[1][0] + '">' + i[0] + '</a> is in Category: Articles needing copy edit. It has a <a href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' + str(i[1][2]) + '.</br>How would you update it?<br/><iframe src="' + i[1][0] + '" align=right style="height: 40%; width: 80%;">[Can not display <a href="' + i[1][0] + '">' + i[1][0] + '</a> inline as an iframe here.]</iframe>')
+		f.write('The article <a href="' + i[1][0] + '">' + i[0] + '</a> is too wordy with a median <a href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' + str(i[1][2]) + '.</br>How would you rewrite it to be easier to read?<br/><iframe src="' + i[1][0] + '" align=right style="height: 40%; width: 80%;">[Can not display <a href="' + i[1][0] + '">' + i[1][0] + '</a> inline as an iframe here.]</iframe>')
 		f.close()
 		cnt += 1
 		if (cnt == counter):

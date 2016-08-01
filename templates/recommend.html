@@ -10,29 +10,29 @@
 #}
 {% extends "layout.html" %}
 {% block page_content %}
-  <form action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
-    <h3>Please implement this recommendation.</h3>
-      <h4>Question:</h4> 
+  <form autocomplete="off" action="{{ url_for('recommend') }}" method=post>{# class=? for css? #}
+    <h3 clear=all>Please implement this recommendation.</h3 clear=all>
+      <h4 clear=all>Question:</h4 clear=all> 
       {{ files['q']|safe }}
-      <h4>Proposed answer:</h4> 
+      <h4 clear=all>Proposed answer:</h4 clear=all> 
       {{ files['a']|safe }}
       {% if files ['e'] is defined %}
         {% if files ['t'] is defined %}
-          <h3>That answer had initially been opposed with these comments:</h3> 
+          <h3 clear=all>That answer had initially been opposed with these comments:</h3 clear=all> 
           {{ files['t']|safe }}
         {% endif %}
-        <h3>The answer was endorsed with these comments:</h3> 
+        <h3 clear=all>The answer was endorsed with these comments:</h3 clear=all> 
         {{ files['e']|safe }}
       {% else %}
-        <h3>The answer had initially been opposed with these comments:</h3> 
+        <h3 clear=all>The answer had initially been opposed with these comments:</h3 clear=all> 
         {{ files['t']|safe }}
-        <h3>The answer was finally opposed with these comments:</h3> 
+        <h3 clear=all>The answer was finally opposed with these comments:</h3 clear=all> 
         {{ files['o']|safe }}
       {% endif %}
-      <h4>Your implementation:</h4>
+      <h4 clear=all>Your implementation:</h4 clear=all>
       <textarea name=resolution  style="width: 80%; height: 15%;"></textarea>
     <br/>
-    <h4>Optionally add a pertinent web page (e.g. diff or permalink):</h4>
+    <h4 clear=all>Optionally add a pertinent web page (e.g. diff or permalink):</h4 clear=all>
     <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
            style="width: 70%;" />
     <input type=button value=Preview onclick="LoadIframe(); return False;" />
