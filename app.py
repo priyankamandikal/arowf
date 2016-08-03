@@ -327,9 +327,13 @@ def inspect():
 def help():
     return render_template('help.html') # displays links to help docs for each end-point
 
-#@app.errorhandler(404)
-#def not_found(error):
-#    return render_template('error.html'), 404
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def page_not_found(error):
+    return render_template('500.html'), 500
 
 # No cache
 @app.after_request
