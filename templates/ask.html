@@ -2,7 +2,8 @@
 {% block page_content %}
   <form autocomplete="off" action="{{ url_for('ask') }}" method=post>
     <h3 clear=all>Ask a question:</h3 clear=all>
-      <textarea name=question style="width: 80%; height: 15%;"></textarea>
+    <p><a href="http://mediawiki.org/wiki/Accuracy_review/docs/ask" target="_blank">Help doc</a></p>
+      <textarea name=question style="width: 80%; height: 15%;" required></textarea>
       <br/>
       <h4 clear=all>Optionally add a pertinent web page (e.g. diff or permalink):</h4 clear=all>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"

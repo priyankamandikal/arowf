@@ -16,10 +16,11 @@
   <form autocomplete="off" action="{{ url_for('answer') }}" method=post>{# class=? for css? #}
   {% if response == 'a' %}
     <h3 clear=all>Please answer this question.</h3 clear=all>
+    <p><a href="http://mediawiki.org/wiki/Accuracy_review/docs/answer" target="_blank">Help doc</a>
       <h4 clear=all>Question:</h4 clear=all>
       {{ files['q']|safe }}
       <h4 clear=all>Your answer:</h4 clear=all>
-      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
+      <textarea name=answer style="width: 80%; height: 15%;" required></textarea>
       <br/>
       <h4 clear=all>Optionally add a pertinent web page:</h4 clear=all>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
@@ -29,12 +30,13 @@
       <input type=hidden name=record value={{ record }} />
   {% elif response == 'r' %}
     <h3 clear=all>Please review the proposed answer to this question.</h3 clear=all>
+    <p><a href="http://mediawiki.org/wiki/Accuracy_review/docs/review" target="_blank">Help doc</a>
       <h4 clear=all>Question:</h4 clear=all>
       {{ files['q']|safe }}
       <h4 clear=all>Proposed answer:</h4 clear=all> 
       {{ files['a']|safe }}
       <h4 clear=all>Your comments:</h4 clear=all>
-      <textarea name=answer style="width: 80%; height: 15%;"></textarea>
+      <textarea name=answer style="width: 80%; height: 15%;" required></textarea>
       <br/>
       <h4 clear=all>Optionally add a pertinent web page:</h4 clear=all>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"
@@ -45,6 +47,7 @@
       <input type=hidden name=record value={{ record }} />
   {% elif response == 't' %}
     <h3 clear=all>Please decide between this question's proposed answer and opposing comments.</h3 clear=all>
+    <p><a href="http://mediawiki.org/wiki/Accuracy_review/docs/tiebreak" target="_blank">Help doc</a>
       <h4 clear=all>Question:</h4 clear=all> 
       {{ files['q']|safe }}
       <h4 clear=all>Proposed answer:</h4 clear=all> 
@@ -52,7 +55,7 @@
       <h4 clear=all>Comments opposing that proposed answer:</h4 clear=all> 
       {{ files['o']|safe }}
       <h4 clear=all>Your comments:</h4 clear=all>
-      <textarea name=answer  style="width: 80%; height: 15%;"></textarea>
+      <textarea name=answer  style="width: 80%; height: 15%;" required></textarea>
       <br/>
       <h4 clear=all>Optionally add a pertinent web page:</h4 clear=all>
       <input id=iframeurl type=text name=iframeurl placeholder="Optional URL"

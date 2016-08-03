@@ -86,6 +86,18 @@ def nextrecord():
     except:
         return format(1, '09')             # first is 1, not 0
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('register.html') # inputs for name, email, location, phone, aboutme
+    elif request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        location = request.form['location']
+        phone = request.form['phone']
+        aboutme = request.form['aboutme']
+        return redirect(url_for('index'))
+
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
     if request.method == 'GET':
@@ -311,6 +323,10 @@ def inspect():
         revieweragree=revieweragree, reviewerdised=reviewerdised, \
         ratio=ratio, showdone=showdone)
 
+@app.route('/help')
+def help():
+    return render_template('help.html') # displays links to help docs for each end-point
+
 #@app.errorhandler(404)
 #def not_found(error):
 #    return render_template('error.html'), 404
@@ -319,6 +335,8 @@ def inspect():
 @app.after_request
 def add_header(response):
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = 0
     return response
 
 if __name__ == '__main__':
