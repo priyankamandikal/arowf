@@ -133,7 +133,7 @@ if __name__ == '__main__':
 	with open('copy_edit_ranking'+'.pkl', 'wb') as f:
 		pickle.dump(od, f)
 # if __name__ == '__main__':
-# 	with open('copy_edit_ranking'+'.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
+# 	with open('copy_edit_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
 # 		od = pickle.load(f)
 	cnt = 0		
 	counter = int(math.ceil(0.2*len(od)))	# top 20% of rankings

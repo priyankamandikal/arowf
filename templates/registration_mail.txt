@@ -1,0 +1,17 @@
+Hello {{ name }},
+Welcome to AROWF!
+
+We are very excited to have you join our community! To start answering questions and gaining reward points, you will need your token. In case it hasn't already been set, you can go to the home page and set your token.
+Your token is:
+{{ token }}
+
+To get started, you can refer to our help docs here: 
+https://www.mediawiki.org/wiki/Accuracy_review/docs 
+Feel free to contact us anytime you need further assistance.
+
+We look forward to have you contributing!
+
+Sincerely,
+The AROWF Team
+
+Note: replies to this email address are not monitored.

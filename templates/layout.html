@@ -7,11 +7,53 @@
 {% block scripts %}
   {{ super() }}
   <script type="text/javascript">
+
     function LoadIframe() {
       var ifr = document.getElementById('iframeobj');
       ifr.src = document.getElementById('iframeurl').value;
       ifr.style.display = 'block';
     }
+
+    function canRegister(){
+      var unamestatus = document.getElementById('unamestatus').value;
+      var emailstatus = document.getElementById('emailstatus').value;
+      if ((unamestatus=='' || unamestatus==undefined) && (emailstatus=='' || emailstatus==undefined)){
+        return true;
+      }
+      else{
+        alert('Please provide valid inputs!')
+        return false;
+      }
+    }
+
+    function checkValidityFunc(identifier) {
+      return identifier == this;
+    }
+
+    function checkIdValidity(arr, val, msg, msgid) {
+      if( arr.find(checkValidityFunc, val)) {
+        document.getElementById(msgid).innerHTML = msg;
+      }
+      else{
+        document.getElementById(msgid).innerHTML = '';
+      }
+    }
+
+    function canSubmitTokenFunc(tokenVal) {
+      return tokenVal == document.getElementById('token').value;
+    }
+
+    function canSubmitToken(arr) {
+      if( arr.find(canSubmitTokenFunc) ) {
+        alert('Token successfully set!')
+        return true;
+      }
+      else{
+        alert('Invalid Token!');
+        return false;
+      }
+    }
+
   </script>
 {% endblock %}
 
@@ -28,6 +70,7 @@
             <a class="navbar-brand" href="/">Minireview</a>
             <a class="navbar-brand" href="/register" align="right">Register</a>
             <a class="navbar-brand" href="/help" align="right">Help</a>
+            <a class="navbar-brand" href="/token" align="right">Token</a>
         </div>
     </div>
 </div>

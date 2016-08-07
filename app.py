@@ -3,7 +3,7 @@
 @title:       arowf - accuracy review of wikipedias (in) flask.
 @description: Registration-free open source text-based blind review system.
 @author:      Priyanka Mandikal and Jim Salsman.
-@version:     0.7a prebeta of July 14-17, 2016.
+@version:     0.8 prebeta of August 7, 2016.
 @license:     Apache v2 or latest with stronger patent sharing if available.
 @see:     https://github.com/priyankamandikal for previous and subsequent versions.
 ###@@@: means places that I want to continue working on;
@@ -14,12 +14,16 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask.ext.bootstrap import Bootstrap
-from os import listdir, rename, path # for path.sep, .exists() & .getmtime()
+from flask.ext.mail import Mail, Message
+from threading import Thread
+from passlib.hash import pbkdf2_sha512
+from os import listdir, rename, path, environ # for path.sep, .exists() & .getmtime()
 from random import choice
 from time import ctime
 from re import compile, match, sub
+from pickle import dump, load
 
 recdir = 'records' + path.sep                     # data subdirectory
 
@@ -33,19 +37,41 @@ maxinspect = 20  ###@@@ (TODO below:) how many done to /inspect
 ### If not, will HTML comments work for non-displayed codes?
 
 app = Flask(__name__) # create Flask WSGI application
+app.config['SECRET_KEY'] = environ.get('SECRET_KEY')
 
-bootstrap = Bootstrap(app) # create Bootstrap instance
+# mail configuration settings
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = environ.get('MAIL_PASSWORD')
+app.config['AROWF_MAIL_SUBJECT_PREFIX'] = '[AROWF]'
+app.config['AROWF_MAIL_SENDER'] = 'AROWF Admin'
+app.config['AROWF_ADMIN'] = environ.get('AROWF_ADMIN')
 
-###@@@ TODO: registration: a form that emails you a unique invisible token 
-###          which you can paste into a field to add the token to the end 
-###          of your submissions to participate in reputation and work 
-###          tracking, and only shows up in /inspect's response search 
+bootstrap = Bootstrap(app)  # create Bootstrap instance
+mail = Mail(app)            # create Mail instances
 
-app.secret_key = 'enable flash() session cookies' # does what that says
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['AROWF_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
+                  sender=app.config['AROWF_ADMIN'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
+
 
 @app.route('/')
 def index():
     return render_template('index.html')          # in templates subdirectory
+
 
 def linkandescape(txt):
     # substitute urls with tokens, remembering them in a list
@@ -63,6 +89,7 @@ def linkandescape(txt):
     return sub(regex2, match2, escaped)
 regex2 = compile(r'###URL-TOKEN-([1-9][0-9]*)###')
 
+
 def frameurl(url):
     # check if iframeurl matches the urlregexp
     if match(urlregex, url):
@@ -76,6 +103,7 @@ def frameurl(url):
     else:
         return ''
 
+
 def nextrecord():
     try:
         # search files in the records subdirectory to find the greatest number
@@ -86,17 +114,32 @@ def nextrecord():
     except:
         return format(1, '09')             # first is 1, not 0
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    with open('users.pkl', 'r') as f:
+        userdict = load(f)
     if request.method == 'GET':
-        return render_template('register.html') # inputs for name, email, location, phone, aboutme
+        return render_template('register.html', userdict=userdict) # inputs for name, email, timezone, phone, aboutme
     elif request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        location = request.form['location']
-        phone = request.form['phone']
-        aboutme = request.form['aboutme']
+        uname = str(request.form['uname'])      # mandatory
+        email = str(request.form['email'])      # mandatory
+        timezone = request.form['timezone']     # optional
+        phone = request.form['phone']           # optional
+        aboutme = request.form['aboutme']       # optional
+        token = pbkdf2_sha512.encrypt(email)    # setting the token as a salted and hashed email
+        token = token.replace('/', '+')         # filenames can't contain '/'
+        session['token'] = token                # set token in session key on successful registration
+        fn = 'registered' + path.sep + token
+        with open(fn, 'w') as f:                # write reviewer info into a file named by the token
+            f.write(uname+'\n'+email+'\n'+timezone+'\n'+phone+'\n'+aboutme+'\n')
+            f.write('--files--\n')
+        userdict[uname] = email
+        with open('users.pkl', 'w') as f:       # dictionary with keys as usernames and values as emails
+            dump(userdict, f)
+        send_email(email, 'Welcome to AROWF!', 'registration_mail', name=uname, token=token)    # send welcome email with token
         return redirect(url_for('index'))
+
 
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
@@ -113,11 +156,19 @@ def ask():
             return redirect(url_for('index'))          # GET /
             ### RACE condition if two people call nextrecord() simultaniously
             ### ... maybe try adding the process ID to end of fn and renaming?
-        f = open(fn, 'w')
-        f.write(question+'\n') ### only add \n if not already at end? & below
-        f.close()
+        with open(fn, 'w') as f:
+            f.write(question+'\n') ### only add \n if not already at end? & below
+            if 'token' in session:
+                f.write('--REGISTRATION-ID:'+session['token']+'--')
+        if 'token' in session:
+            userfile = 'registered/'+session['token']
+            if path.exists(fn):
+                with open(userfile, 'a') as f:
+                    f.write(fn[8:]+'\n')
+
         flash('Thanks for the question.')  # displays in layout.html
         return redirect(url_for('index'))  # GET /
+
 
 def getrecords():
     records = {} # use a dictionary of file numbers to lists of suffixes
@@ -127,6 +178,7 @@ def getrecords():
         else:
             records[fn[0:9]].append(fn[9]) # add file suffix to list
     return records
+
 
 @app.route('/answer', methods=['GET', 'POST'])
 def answer():
@@ -149,9 +201,8 @@ def answer():
         needs = selected[chosen]            # type of response needed
         files = {}                          # files' contents in a suffix
         for suffix in records[chosen]:      # iterate over the files available
-            f = open(recdir + chosen + suffix, 'r')
-            files[suffix] = f.read()        # read textual contents of each
-            f.close()
+            with open(recdir + chosen + suffix, 'r') as f:
+                files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())        # read textual contents of each
         return render_template('answer.html', record=chosen, response=needs,
                                files=files) # invoke the template
     elif request.method == 'POST':
@@ -172,11 +223,18 @@ def answer():
             flash('Someone else just submitted the requested response.')
             return redirect(url_for('index'))
             ###@@@ SLOW RACE: lock choice() responses below for some time?
-        f = open(fn, 'w')
-        f.write(answer+'\n') ### only add \n if not already at end?
-        f.close()
+        with open(fn, 'w') as f:
+            f.write(answer+'\n') ### only add \n if not already at end?
+            if 'token' in session:
+                f.write('--REGISTRATION-ID:'+session['token']+'--')
+        if 'token' in session:
+            userfile = 'registered/'+session['token']
+            if path.exists(fn):
+                with open(userfile, 'a') as f:
+                    f.write(fn[8:]+'\n')
         flash('Thank you for your response.') # displays in layout.html
         return redirect(url_for('index'))
+
 
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend():
@@ -195,9 +253,8 @@ def recommend():
         suffixes = selected[selection]
         files = {}                              # to map file suffixes to text
         for suffix in suffixes:                 # iterate over available files
-            f = open(recdir + selection + suffix, 'r')
-            files[suffix] = f.read()            # read textual contents of each
-            f.close()
+            with open(recdir + selection + suffix, 'r') as f:
+                files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())            # read textual contents of each
         return render_template('recommend.html', record=selection, files=files) 
     elif request.method == 'POST':
         record = request.form['record']         # file num. w/zeroes ### check
@@ -209,11 +266,18 @@ def recommend():
             flash('Someone else just submitted another implementation.')
             return redirect(url_for('index'))
             ###@@@ SLOW RACE: see above
-        f = open(fn, 'w')
-        f.write(resolution+'\n') ### only add \n if not already at end?
-        f.close()
+        with open(fn, 'w') as f:
+            f.write(resolution+'\n') ### only add \n if not already at end?
+            if 'token' in session:
+                f.write('--REGISTRATION-ID:'+session['token']+'--')
+        if 'token' in session:
+            userfile = 'registered/'+session['token']
+            if path.exists(fn):
+                with open(userfile, 'a') as f:
+                    f.write(fn[8:]+'\n')
         flash('Thank you for the implementation.') # displays in layout.html
         return redirect(url_for('index'))
+
 
 def mintime(v):
     if len(v) > 0:
@@ -221,11 +285,13 @@ def mintime(v):
     else:
         return 'n/a'
 
+
 def maxtime(v):
     if len(v) > 0:
         return ctime(max(v))
     else:
         return 'n/a'
+
 
 @app.route('/inspect', methods=['GET']) # optional: ?q=searchstring&r=reviewer
 def inspect():
@@ -256,9 +322,8 @@ def inspect():
             if stringhit:
                 stringtimes[suffix].append(modtime)
             if reviewer and suffix in ['a', 'e', 'o', 't']:
-                f = open(recdir + fn + suffix, 'r')
-                contents = f.read()        # look for the reviewer argument
-                f.close()
+                with open(recdir + fn + suffix, 'r') as f:
+                    contents = f.read()        # look for the reviewer argument
                 if reviewer in contents:         # substring search
                     reviewercount = reviewercount + 1
                     reviewtimes[suffix].append(modtime) # store time
@@ -323,17 +388,31 @@ def inspect():
         revieweragree=revieweragree, reviewerdised=reviewerdised, \
         ratio=ratio, showdone=showdone)
 
+
 @app.route('/help')
 def help():
     return render_template('help.html') # displays links to help docs for each end-point
+
+
+@app.route('/token', methods=['GET', 'POST'])
+def token():
+    if request.method == 'GET':
+        tokenNames = listdir('registered/')         # get list of all tokens
+        return render_template('token.html', token=session['token'], tokenNames=tokenNames) # displays links to help docs for each end-point
+    elif request.method == 'POST':                  # if token not set in session key
+        session['token'] = request.form['token']    # obtain from form and set it
+        return redirect(url_for('index'))
+
 
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
 
+
 @app.errorhandler(500)
 def page_not_found(error):
     return render_template('500.html'), 500
+
 
 # No cache
 @app.after_request
@@ -342,6 +421,7 @@ def add_header(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = 0
     return response
+
 
 if __name__ == '__main__':
     app.run(

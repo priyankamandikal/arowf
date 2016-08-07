@@ -1,19 +1,21 @@
 {% extends "layout.html" %}
 {% block page_content %}
-  <form autocomplete="off" action="{{ url_for('register') }}" method=post>
+  <form action="{{ url_for('register') }}" method=post onsubmit="return canRegister()">
     <h3 clear=all>Please fill in your details</h3 clear=all>
     <p><a href="http://mediawiki.org/wiki/Accuracy_review/docs/register" target="_blank">Help doc</a></p>
       <br/>
-      <h4 clear=all>Name</h4 clear=all>
-      <input id=name type=text name=name style="width: 40%;" required />
+      <h4 clear=all>User Name</h4 clear=all>
+      <input id=uname type=text name=uname onkeyup="checkIdValidity({{userdict.keys()|safe}}, this.value, 'This username is already registered. Please pick another one!', 'unamestatus')" style="width: 40%;" required />
+      <span id="unamestatus" value='' style="color:red;"></span>
       <h4 clear=all>Email address</h4 clear=all>
-      <input id=email type=email name=email style="width: 40%;" required/>
-      <h4 clear=all>Location</h4 clear=all>
-      <input id=location type=text name=location style="width: 40%;" />
-      <h4 clear=all>Phone Number</h4 clear=all>
-      <input id=phone type=number name=phone style="width: 40%;" />
-      <h4 clear=all>About Me</h4 clear=all>
-      <input id=aboutme type=text name=aboutme style="width: 40%;" />
+      <input id=email type=email name=email onkeyup="checkIdValidity({{userdict.values()|safe}}, this.value, 'This email is already registered.', 'emailstatus')" style="width: 40%;" required/>
+      <span id="emailstatus" value='' style="color:red;"></span>
+      <h4 clear=all>Time zone</h4 clear=all>
+      <input id=timezone type=text name=timezone placeholder='Optional' style="width: 40%;" />
+      <h4 clear=all>Phone number</h4 clear=all>
+      <input id=phone type=number name=phone placeholder='Optional' style="width: 40%;" />
+      <h4 clear=all>About me</h4 clear=all>
+      <input id=aboutme type=text name=aboutme placeholder='Optional' style="width: 40%;" />
       <br/>
       <br/>
       <input type=submit value=Register />
