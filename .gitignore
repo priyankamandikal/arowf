@@ -87,3 +87,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# registered user info
+registered/
+users.pkl
+
+# records folder
+records/
