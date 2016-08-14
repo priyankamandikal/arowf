@@ -103,7 +103,7 @@ if __name__ == '__main__':
 	mean_fk = mean(fk)
 	std_fk = std(fk)
 	for i in d.values():	# here i is a list of [link, pv, fk]
-		i. append(format(float((i[1] - mean_pv)/std_pv) - float(((i[2] - mean_fk)/std_fk)), '.2f'))	#  to rank higher in severity, article should rank high in pageview on low on fk score
+		i. append(format(float((i[1] - mean_pv)/std_pv) - float(((i[2] - mean_fk)/std_fk)), '.2f'))	#  to rank higher in severity, article should rank high in pageview and low on fk score
 		print i
 	od = OrderedDict(sorted(d.items(), key=lambda t:t[1][3], reverse=True))	# ordered dict in descending order of final score
 	print '\n\nArticle rankings based on final score:\n'
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 		f.write('The article <a href="' + i[1][0] + '">' + i[0] + 
 			'</a> is too wordy with a median <a href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' 
 			+ str(i[1][2]) + '.</br>How would you rewrite it to be easier to read?<br/><div style="border:1px solid black;"><a href="'
-			+ link + '">' + link + '</a><iframe src="' + i[1][0] + 
+			+ i[1][0] + '">' + i[1][0] + '</a><iframe src="' + i[1][0] + 
 			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[1][0] + '">' + i[1][0] 
 			+ '</a> inline as an iframe here.]</iframe></div>')
 		f.close()
