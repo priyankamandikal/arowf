@@ -97,3 +97,6 @@ records/
 
 # pickle files
 *.pkl
+
+# log directory
+logs/
