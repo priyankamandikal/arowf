@@ -94,3 +94,6 @@ users.pkl
 
 # records folder
 records/
+
+# pickle files
+*.pkl
