@@ -68,25 +68,35 @@ if __name__ == '__main__':
 #       od = load(f)
     cnt = 0     
     counter = int(ceil(0.2*len(od)))    # top 20% of rankings
-    for i in od.items():
-            fn = recdir + nextrecord() + 'q'
-            if path.exists(fn):
-                print('A billion questions reached! Start answering!')
-                exit()
 
-            # importing function from wikiwho_api_api.py. This uses the findWord function in Wikiwho_simple.py
-            date = mainFunction(title)
-            f = open(fn, 'w')
-            f.write('The article <a href="' + i[1][0] + '">' + i[0] + 
-                '</a> has the word \'recently\' inserted in ' + date +
-                '. Is it still correctly used? The context is:</br><i>' + i[1][2] + 
-                '</i></br><div style="border:1px solid black;"><a href="'+link+'">'+link+'</a><iframe src="' + i[1][0] + 
-                '" style="height: 40%; width: 100%;">[Can not display <a href="' + 
-                i[1][0] + '">' + i[1][0] + '</a> inline as an iframe here.]</iframe></div>')
-            f.close()
-            cnt += 1
-            if (cnt == counter):
-                exit()
+    #url = 'http://127.0.0.1:5000/ask'   # url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
+    
+    for i in od.items():
+
+        # importing function from wikiwho_api_api.py. This uses the findWord function in Wikiwho_simple.py
+        date = mainFunction(title)
+
+        # POSTing to ask
+        # data = {'question':'The article '+i[1][0]+' has the word 'recently' inserted in '+date+'. Is it still correctly used? The context is:\n'+i[1][2], 
+        #       'iframeurl':i[1][0]}
+        # r = requests.post(url, data=data)
+
+        fn = recdir + nextrecord() + 'q'
+        if path.exists(fn):
+            print('A billion questions reached! Start answering!')
+            exit()
+
+        f = open(fn, 'w')
+        f.write('The article <a href="' + i[1][0] + '">' + i[0] + 
+            '</a> has the word \'recently\' inserted in ' + date +
+            '. Is it still correctly used? The context is:</br><i>' + i[1][2] + 
+            '</i></br><div style="border:1px solid black;"><a href="'+i[1][0]+'">'+i[1][0]+'</a><iframe src="' + i[1][0] + 
+            '" style="height: 40%; width: 100%;">[Can not display <a href="' + 
+            i[1][0] + '">' + i[1][0] + '</a> inline as an iframe here.]</iframe></div>')
+        f.close()
+        cnt += 1
+        if (cnt == counter):
+            exit()
 
 
     

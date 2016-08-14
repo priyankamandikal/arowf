@@ -97,12 +97,23 @@ if __name__ == '__main__':
 		print item
 	with open('student_edits_ranking.pkl', 'wb') as f:
 		pickle.dump(od, f)
-# if __name__ == '__main__':
-# 	with open('student_edits_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
-# 		od = pickle.load(f)
+
+	
+if __name__ == '__main__':
+	with open('student_edits_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
+		od = pickle.load(f)
 	cnt = 0		
 	counter = int(ceil(0.2*len(od)))	# top 20% of rankings
+	
+	#url = 'http://127.0.0.1:5000/ask'	# url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
+	
 	for i in od:
+		
+		# POSTing to ask
+		# data = {'question':'The article '+i[2]+' was edited by a student editor.\nThe diff corresponding to the edit is displayed below. Does it look alright?\n'+i[3], 
+		#		'iframeurl':i[3]}
+		# r = requests.post(url, data=data)
+		
 		fn = recdir + nextrecord() + 'q'
 		print fn
 		if path.exists(fn):
@@ -110,7 +121,7 @@ if __name__ == '__main__':
 			exit()
 		f = open(fn, 'w')
 		f.write('The article <a href="' + i[2] + '">' + i[1] + 
-			'</a> was edited by a student editor.</br>The diff corresponding to the edit is displayed below. Does it look alright?<br/><a style="float:right;" href="'
+			'</a> was edited by a student editor.</br>The diff corresponding to the edit is displayed below. Has it been correctly edited?<br/><a style="float:right;" href="'
 			+ i[3] + '">' + i[3] + '</a><iframe src="' + i[3] + 
 			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[3] + '">' + i[3] 
 			+ '</a> inline as an iframe here.]</iframe>')

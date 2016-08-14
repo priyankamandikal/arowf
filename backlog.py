@@ -63,7 +63,16 @@ if __name__ == '__main__':
 # 		od = load(f)
 	cnt = 0		
 	counter = int(ceil(0.2*len(od)))	# top 20% of rankings
+
+	#url = 'http://127.0.0.1:5000/ask'	# url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
+	
 	for i in od.items():
+
+		# POSTing to ask
+		# data = {'question':'The article '+i[1][0]+' is in https://en.wikipedia.org/wiki/'+i[1][2]+'.\nHow would you update it?\n'+i[1][2], 
+		# 		'iframeurl':i[1][0]}
+		# r = requests.post(url, data=data)
+		
 		fn = recdir + nextrecord() + 'q'
 		print fn
 		if path.exists(fn):
