@@ -34,7 +34,7 @@ if __name__ == '__main__':
 					print('A billion questions reached! Answer!')
 					exit()
 				f = open(fn, 'w')
-				f.write('The article <a href="' + link + '">' + title + '</a> is in ' + categ + '.</br>How would you update it?<br/><div style="border:1px solid black;"><a href="'+link+'">'+link+'</a><iframe src="' + link + '" style="height: 40%; width: 100%;">[Can not display <a href="' + link + '">' + link + '</a> inline as an iframe here.]</iframe></div>')
+				f.write('The article <a href="' + link + '">' + title + '</a> is in ' + categ + '.</br>How would you update it?<br/><a style="float:right;" href="'+link+'">'+link+'</a><iframe src="' + link + '" style="height: 40%; width: 100%;">[Can not display <a href="' + link + '">' + link + '</a> inline as an iframe here.]</iframe>')
 				#f.write(categ + '\n' + title + '\n' + link +'\n')	# in file, print <backlog category>, <title>, <link>
 				f.close()
 				cnt = cnt+1

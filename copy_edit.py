@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
 	bs = BeautifulSoup(r.text)
 	cnt = 0
-	d = {}
+	d = []
 	print '\nFetching articles from the copy-edit backlog category:\n'
 	for catgroup in bs.find_all('div', 'mw-category-group'):
 		for entry in catgroup.find_all('li'):
@@ -86,28 +86,29 @@ if __name__ == '__main__':
 			pageviews = article_views(title)
 			fk_score = flesch_kincaid_score(title)
 			print title, link, pageviews, fk_score
-			d[title] = [link, pageviews, fk_score]
+			d.append([title, link, pageviews, fk_score])
 			cnt = cnt+1
-			if(cnt==25):
+			if(cnt==5):
 				break
-		if(cnt==25):
+		if(cnt==5):
 				break
 
 	pv = []
 	fk = []
-	for i in d.values():
-		pv.append(i[1])		# get all the pageviews
-		fk.append(i[2])		# get all the fk-scores
+	for i in d:
+		pv.append(i[2])		# get all the pageviews
+		fk.append(i[3])		# get all the fk-scores
 	mean_pv = mean(pv)		
 	std_pv = std(pv)
 	mean_fk = mean(fk)
 	std_fk = std(fk)
-	for i in d.values():	# here i is a list of [link, pv, fk]
-		i. append(format(float((i[1] - mean_pv)/std_pv) - float(((i[2] - mean_fk)/std_fk)), '.2f'))	#  to rank higher in severity, article should rank high in pageview and low on fk score
+	for i in d:	# here i is a list of [title, link, pv, fk]
+		i. append(format(float((i[2] - mean_pv)/std_pv) - float(((i[3] - mean_fk)/std_fk)), '.2f'))	#  to rank higher in severity, article should rank high in pageview and low on fk score
 		print i
-	od = OrderedDict(sorted(d.items(), key=lambda t:t[1][3], reverse=True))	# ordered dict in descending order of final score
+	#od = OrderedDict(sorted(d.items(), key=lambda t:t[1][3], reverse=True))	# ordered dict in descending order of final score
+	od = sorted(d, key=itemgetter(4), reverse=True)		# ordered list in descending order of final score
 	print '\n\nArticle rankings based on final score:\n'
-	for item in od.items():
+	for item in od:
 		print item
 	with open('copy_edit_ranking.pkl', 'wb') as f:
 		pickle.dump(od, f)
@@ -119,7 +120,7 @@ if __name__ == '__main__':
 
 	#url = 'http://127.0.0.1:5000/ask'	# url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
 	
-	for i in od.items():
+	for i in od:
 		
 		# POSTing to ask
         # data = {'question':'The article '+i[1][0]+' is too wordy with a median Flesh-Kincaid readability score of '+str(i[1][2])+'. How would you rewrite it to be easier to read?', 
@@ -132,12 +133,12 @@ if __name__ == '__main__':
 			print('A billion questions reached! Start answering!')
 			exit()
 		f = open(fn, 'w')
-		f.write('The article <a href="' + i[1][0] + '">' + i[0] + 
+		f.write('The article <a href="' + i[1] + '">' + i[0] + 
 			'</a> is too wordy with a median <a href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' 
-			+ str(i[1][2]) + '.</br>How would you rewrite it to be easier to read?<br/><div style="border:1px solid black;"><a href="'
-			+ i[1][0] + '">' + i[1][0] + '</a><iframe src="' + i[1][0] + 
-			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[1][0] + '">' + i[1][0] 
-			+ '</a> inline as an iframe here.]</iframe></div>')
+			+ str(i[3]) + '.</br>How would you rewrite it to be easier to read?<br/><a style="float:right;" href="'
+			+ i[1] + '">' + i[1] + '</a><iframe src="' + i[1] + 
+			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[1] + '">' + i[1] 
+			+ '</a> inline as an iframe here.]</iframe>')
 		f.close()
 		cnt += 1
 		if (cnt == counter):

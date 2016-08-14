@@ -3,7 +3,7 @@
 @title:       arowf - accuracy review of wikipedias (in) flask.
 @description: Registration-free open source text-based blind review system.
 @author:      Priyanka Mandikal and Jim Salsman.
-@version:     0.8 prebeta of August 7, 2016.
+@version:     0.9 prebeta of August 15, 2016.
 @license:     Apache v2 or latest with stronger patent sharing if available.
 @see:     https://github.com/priyankamandikal for previous and subsequent versions.
 ###@@@: means places that I want to continue working on;

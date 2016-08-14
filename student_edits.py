@@ -24,7 +24,7 @@ diff_url = 'https://en.wikipedia.org/w/index.php?diff=prev'
 # most recent contribs first by default
 # ucuser for username
 # uclimit to specify max number contribs retreived, here top 5 for that contributor
-usercontribs_api = 'https://en.wikipedia.org/w/api.php?action=query&list=usercontribs&ucnamespace=0&format=json&uclimit=5'
+usercontribs_api = 'https://en.wikipedia.org/w/api.php?action=query&list=usercontribs&ucnamespace=0&format=json&uclimit=1'
 
 recdir = 'records' + path.sep
 
@@ -75,9 +75,9 @@ if __name__ == '__main__':
 			print contributor, title, pageviews, size
 			d.append([contributor, title, link, diff, pageviews, size])
 			cnt = cnt+1
-			if(cnt==10):
+			if(cnt==5):
 				break
-		if(cnt==10):
+		if(cnt==5):
 				break
 
 	pv = []
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 	with open('student_edits_ranking.pkl', 'wb') as f:
 		pickle.dump(od, f)
 
-	
+
 if __name__ == '__main__':
 	with open('student_edits_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
 		od = pickle.load(f)

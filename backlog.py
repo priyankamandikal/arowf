@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+### denote lines that need to be changed for different categories
+
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")			# to handle UnicodeDecode errors
@@ -10,12 +12,14 @@ import pickle				 			# to store article rankings
 import json 							# for parsing the json response
 from urllib2 import urlopen				# to load urls
 from os import path, listdir
-from collections import OrderedDict		# to store articles in the order of decreasing pageviews in a dict
+from operator import itemgetter			# to rank articles in the order of decreasing pageviews in a list
+# from collections import OrderedDict		# to store articles in the order of decreasing pageviews in a dict
 from pageviews import format_date, article_views	# to get pageviews
 
 # cmlimit to specify number of articles to extract, max can be 500 (5000 for bots)
 # cmtitle for name of Category to look in
-# cmstartsortkeyprefix for starting the article listing from a particular alphabet or set of alphabets
+# cmstartsortkeyprefix for starting the article listing from a particular alphabet or set of alphabets, 
+# 'b' for Labs
 category_api_url = 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=5&format=json&cmstartsortkeyprefix=b'
 recdir = 'records' + path.sep
 
@@ -35,27 +39,28 @@ if __name__ == '__main__':
 	#category_list = ['Category:All_Wikipedia_articles_in_need_of_updating', 
 	#				'Category:All_NPOV_disputes']
 	try:
-		category_url = '&cmtitle='.join([category_api_url, 'Category:All_NPOV_disputes'])
+		category_url = '&cmtitle='.join([category_api_url, 'Category:All_Wikipedia_articles_in_need_of_updating']) ###
 		json_obj = urlopen(category_url).read()
 	except:
 		print "Error while obtaining articles from Category API"
 		print format_exc()
 
 	readable_json = json.loads(json_obj)
-	d = {}
+	d = []						# list of lists of rankings to be stored in a pickle file
 	for ele in readable_json['query']['categorymembers']:
 		title = ele['title']
 		link = '/'.join(['https://en.wikipedia.org/wiki', title.replace(' ', '_')])
-		categ = 'Category:All_NPOV_disputes'
+		categ = 'Category:All_Wikipedia_articles_in_need_of_updating'	###
 		pageviews = article_views(title)
-		d[title] = [link, pageviews, categ]
+		d.append([title, link, pageviews, categ])
 
-	od = OrderedDict(sorted(d.items(), key=lambda t:t[1][1], reverse=True))	# ordered dict in descending order of final score
+	# od = OrderedDict(sorted(d.items(), key=lambda t:t[1][1], reverse=True))	# ordered dict in descending order of final score
+	od = sorted(d, key=itemgetter(2), reverse=True)	# ordered list in descending order of pageviews
 	print '\n\nArticle rankings based on pageviews:\n'
-	for item in od.items():
+	for item in od:
 		print item
-	#with open('update_b_ranking.pkl', 'wb') as f:
-	with open('npov_b_ranking.pkl', 'wb') as f:
+	#with open('npov_b_ranking.pkl', 'wb') as f:
+	with open('outdated_b_ranking.pkl', 'wb') as f:
 		pickle.dump(od, f)
 
 # if __name__ == '__main__':
@@ -66,11 +71,11 @@ if __name__ == '__main__':
 
 	#url = 'http://127.0.0.1:5000/ask'	# url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
 	
-	for i in od.items():
+	for i in od:
 
 		# POSTing to ask
-		# data = {'question':'The article '+i[1][0]+' is in https://en.wikipedia.org/wiki/'+i[1][2]+'.\nHow would you update it?\n'+i[1][2], 
-		# 		'iframeurl':i[1][0]}
+		# data = {'question':'The article '+i[1]+' is in https://en.wikipedia.org/wiki/'+i[3]+'.\nHow would you resolve it?\n'+i[3], 
+		# 		'iframeurl':i[1]}
 		# r = requests.post(url, data=data)
 		
 		fn = recdir + nextrecord() + 'q'
@@ -79,12 +84,13 @@ if __name__ == '__main__':
 			print('A billion questions reached! Start answering!')
 			exit()
 		f = open(fn, 'w')
-		f.write('The article <a href="' + i[1][0] + '">' + i[0] + 
-			'</a> is in <a href = "https://en.wikipedia.org/wiki/'+ i[1][2] + '">' + i[1][2] + 
-			'</a>. How would you update it?<br/><div style="border:1px solid black;"><a href="' + 
-			i[1][0] + '">'+i[1][0]+'</a><iframe src="' + i[1][0] + 
-			'" style="height: 40%; width: 100%;">[Can not display <a href="' + i[1][0] + '">' 
-			+ i[1][0] + '</a> inline as an iframe here.]</iframe></div>')
+		# use 'How would you resolve it?' for NPOV and 'How would you update it?' for outdated
+		f.write('The article <a href="' + i[1] + '">' + i[0] + 
+			'</a> is in <a href = "https://en.wikipedia.org/wiki/'+ i[3] + '">' + i[3] + 
+			'</a>. How would you update it?<br/><a style="float:right;" href="' + 
+			i[1] + '">'+i[1]+'</a><iframe src="' + i[1] + 
+			'" style="height: 40%; width: 100%;">[Can not display <a href="' + i[1] + '">' 
+			+ i[1] + '</a> inline as an iframe here.]</iframe>')	###
 		f.close()
 		cnt += 1
 		if (cnt == counter):
