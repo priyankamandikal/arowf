@@ -15,17 +15,19 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 from flask import Flask, render_template, redirect, url_for, request, flash, session
-from flask.ext.bootstrap import Bootstrap
-from flask.ext.mail import Mail, Message
-from threading import Thread
-from passlib.hash import pbkdf2_sha512
+from flask.ext.bootstrap import Bootstrap     # bootstrap templates 
+from flask.ext.mail import Mail, Message      # email sending
+from threading import Thread                  # to send asynchronous emails
+from passlib.hash import pbkdf2_sha512        # for creatung tokens
 from os import listdir, rename, path, environ # for path.sep, .exists() & .getmtime()
-from random import choice
-from time import ctime
-from re import compile, match, sub
-from pickle import dump, load
+from random import choice                     # chosing a random question file
+from time import ctime                        # file analysis in inspect()
+from re import compile, match, sub            # for url and token matching
+from pickle import dump, load                 # for storing dict of username and token for redundancy checking
+from datetime import date, datetime           # for logging
+from collections import OrderedDict           # to store question types in the order of modification times
 
-recdir = 'records' + path.sep                     # data subdirectory
+recdir = 'records' + path.sep                 # data subdirectory
 
 urlregex = compile(r'((https|ftp|http)://(((?!</p>| )).)*)')
 ###@@@ make sure this handles unicode and parens
@@ -144,12 +146,21 @@ def register():
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
     if request.method == 'GET':
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:
+            token = session['token']
+        with open(logfn, 'a') as f:     # logging token, IP addr, end-point, request type
+            log = token+' '+request.environ['REMOTE_ADDR']+' ask'+' GET'+'\n'
+            f.write(log)
         return render_template('ask.html') # single textarea & submit button
     elif request.method == 'POST':
         question = linkandescape(request.form['question'])
         question = question + frameurl(request.form['iframeurl'])
         ### sanity-check size of question field
-        fn = 'records' + path.sep + nextrecord() + 'q' # new question filename
+        qn_number = nextrecord()
+        fn = 'records' + path.sep + qn_number + 'q' # new question filename
         # checking if the file exists should prevent overflow(?)
         if path.exists(fn):
             flash('Overflow: a billion questions is too many; sorry.')
@@ -160,6 +171,14 @@ def ask():
             f.write(question+'\n') ### only add \n if not already at end? & below
             if 'token' in session:
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:
+            token = session['token']
+        with open(logfn, 'a') as f:     # logging token, IP addr, end-point, request type, question number
+            log = token+' '+request.environ['REMOTE_ADDR']+' ask'+' POST'+' '+qn_number+'\n'
+            f.write(log)
         if 'token' in session:
             userfile = 'registered/'+session['token']
             if path.exists(fn):
@@ -203,6 +222,14 @@ def answer():
         for suffix in records[chosen]:      # iterate over the files available
             with open(recdir + chosen + suffix, 'r') as f:
                 files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())        # read textual contents of each
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:  # logging token, IP addr, end-point, request type, question number, needed answer
+            token = session['token']
+        with open(logfn, 'a') as f:     
+            log = token+' '+request.environ['REMOTE_ADDR']+' answer'+' GET'+' '+chosen+' '+needs+'\n'
+            f.write(log)
         return render_template('answer.html', record=chosen, response=needs,
                                files=files) # invoke the template
     elif request.method == 'POST':
@@ -227,6 +254,14 @@ def answer():
             f.write(answer+'\n') ### only add \n if not already at end?
             if 'token' in session:
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:  # logging token, IP addr, end-point, request type, question number, given answer
+            token = session['token']
+        with open(logfn, 'a') as f:     
+            log = token+' '+request.environ['REMOTE_ADDR']+' answer'+' POST'+' '+record+' '+response+'\n'
+            f.write(log)
         if 'token' in session:
             userfile = 'registered/'+session['token']
             if path.exists(fn):
@@ -239,7 +274,7 @@ def answer():
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend():
     if request.method == 'GET':
-        records = getrecords()              # hopefully populated dictionary
+        records = getrecords()              # populated dictionary
         selected = {}                       # empty dictionary (hash table)
         for ns, l in records.items():       # iterate over keys and values 
             if ns in selected or 'd' in l:  # already seen filenumber or done
@@ -255,6 +290,14 @@ def recommend():
         for suffix in suffixes:                 # iterate over available files
             with open(recdir + selection + suffix, 'r') as f:
                 files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())            # read textual contents of each
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:  
+            token = session['token']
+        with open(logfn, 'a') as f: # logging token, IP addr, end-point, request type, question number
+            log = token+' '+request.environ['REMOTE_ADDR']+' recommend'+' GET '+selection+'\n'
+            f.write(log)
         return render_template('recommend.html', record=selection, files=files) 
     elif request.method == 'POST':
         record = request.form['record']         # file num. w/zeroes ### check
@@ -270,6 +313,26 @@ def recommend():
             f.write(resolution+'\n') ### only add \n if not already at end?
             if 'token' in session:
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
+        records = getrecords()
+        modtime = {}
+        for l in records[record]:
+            modtime[l] = path.getmtime(recdir+record+l)
+        od = OrderedDict(sorted(modtime.items(), key=lambda t: t[1]))
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn1 = './logs/activity-'+logdate
+        token = 'Anonymous'
+        if 'token' in session:  
+            token = session['token']
+        with open(logfn1, 'a') as f: # logging token, IP addr, end-point, request type, question number in activities
+            log = token+' '+request.environ['REMOTE_ADDR']+' recommend'+' POST '+record+'\n'
+            f.write(log)
+        logfn2 = './logs/results-'+logdate
+        with open(logfn2, 'a') as f: # logging question number, types and mod times of all realted files in the order of creation in results
+            f.write(record+' ')
+            for qntype, mtime in od.items():
+                log = qntype+' '+datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')+' '
+                f.write(log)
+            f.write('\n')
         if 'token' in session:
             userfile = 'registered/'+session['token']
             if path.exists(fn):
