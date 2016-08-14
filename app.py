@@ -96,7 +96,7 @@ def frameurl(url):
         qurl = url.replace('"', '%22') # hexify quotation marks
         # if so, return indented html to display it as an iframe
         return '\n\n<br/>\n<iframe src="' + qurl \
-                + '" align=right style="height: 40%; width: 80%;">' \
+                + '" style="height: 40%; width:100%">' \
                 + '[Can not display <a href="' + qurl + '">' + qurl \
                 + '</a> inline as an iframe here.]</iframe>i' \
                 + '<br\>\n'

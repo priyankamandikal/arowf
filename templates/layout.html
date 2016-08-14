@@ -15,9 +15,9 @@
     }
 
     function canRegister(){
-      var unamestatus = document.getElementById('unamestatus').value;
-      var emailstatus = document.getElementById('emailstatus').value;
-      if ((unamestatus=='' || unamestatus==undefined) && (emailstatus=='' || emailstatus==undefined)){
+      var unamestatus = document.getElementById('unamestatus').innerHTML;
+      var emailstatus = document.getElementById('emailstatus').innerHTML;
+      if (unamestatus=='' && emailstatus==''){
         return true;
       }
       else{
