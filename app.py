@@ -314,7 +314,7 @@ def recommend():
             if 'token' in session:
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
         records = getrecords()
-        modtime = {}
+        modtime = {}                # file modification times for question types
         for l in records[record]:
             modtime[l] = path.getmtime(recdir+record+l)
         od = OrderedDict(sorted(modtime.items(), key=lambda t: t[1]))

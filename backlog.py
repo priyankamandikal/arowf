@@ -19,9 +19,9 @@ from pageviews import format_date, article_views	# to get pageviews
 # cmlimit to specify number of articles to extract, max can be 500 (5000 for bots)
 # cmtitle for name of Category to look in
 # cmstartsortkeyprefix for starting the article listing from a particular alphabet or set of alphabets, 
-# 'b' for Labs
-category_api_url = 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=5&format=json&cmstartsortkeyprefix=b'
-recdir = 'records' + path.sep
+# 'b' for PA outdated
+category_api_url = 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=500&format=json&cmstartsortkeyprefix=m'	###
+recdir = 'TL_records' + path.sep 	###
 
 
 def nextrecord():
@@ -39,20 +39,23 @@ if __name__ == '__main__':
 	#category_list = ['Category:All_Wikipedia_articles_in_need_of_updating', 
 	#				'Category:All_NPOV_disputes']
 	try:
-		category_url = '&cmtitle='.join([category_api_url, 'Category:All_Wikipedia_articles_in_need_of_updating']) ###
+		category_url = '&cmtitle='.join([category_api_url, 'Category:All_NPOV_disputes']) ###
 		json_obj = urlopen(category_url).read()
 	except:
 		print "Error while obtaining articles from Category API"
 		print format_exc()
 
 	readable_json = json.loads(json_obj)
+	cnt = 0
 	d = []						# list of lists of rankings to be stored in a pickle file
 	for ele in readable_json['query']['categorymembers']:
 		title = ele['title']
 		link = '/'.join(['https://en.wikipedia.org/wiki', title.replace(' ', '_')])
-		categ = 'Category:All_Wikipedia_articles_in_need_of_updating'	###
+		categ = 'Category:All_NPOV_disputes'	###
 		pageviews = article_views(title)
+		print cnt+1, title, pageviews
 		d.append([title, link, pageviews, categ])
+		cnt = cnt+1
 
 	# od = OrderedDict(sorted(d.items(), key=lambda t:t[1][1], reverse=True))	# ordered dict in descending order of final score
 	od = sorted(d, key=itemgetter(2), reverse=True)	# ordered list in descending order of pageviews
@@ -60,11 +63,11 @@ if __name__ == '__main__':
 	for item in od:
 		print item
 	#with open('npov_b_ranking.pkl', 'wb') as f:
-	with open('outdated_b_ranking.pkl', 'wb') as f:
+	with open('TL_pickles/npov_m_ranking.pkl', 'wb') as f:	### 
 		pickle.dump(od, f)
 
 # if __name__ == '__main__':
-# 	with open('backlog_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
+# 	with open('PA_pickles/npov_m_ranking.pkl', 'rb') as f:	### use when od has already been created; comment above stuff
 # 		od = load(f)
 	cnt = 0		
 	counter = int(ceil(0.2*len(od)))	# top 20% of rankings
@@ -87,7 +90,7 @@ if __name__ == '__main__':
 		# use 'How would you resolve it?' for NPOV and 'How would you update it?' for outdated
 		f.write('The article <a href="' + i[1] + '">' + i[0] + 
 			'</a> is in <a href = "https://en.wikipedia.org/wiki/'+ i[3] + '">' + i[3] + 
-			'</a>. How would you update it?<br/><a style="float:right;" href="' + 
+			'</a>. How would you resolve it?<br/><a style="float:right;" href="' + 
 			i[1] + '">'+i[1]+'</a><iframe src="' + i[1] + 
 			'" style="height: 40%; width: 100%;">[Can not display <a href="' + i[1] + '">' 
 			+ i[1] + '</a> inline as an iframe here.]</iframe>')	###

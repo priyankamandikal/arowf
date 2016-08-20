@@ -6,14 +6,15 @@ sys.setdefaultencoding("utf-8")	# to handle UnicodeDecode errors
 
 import requests
 from math import ceil
-import traceback
+from traceback import format_exc
 import re
 import operator
 import pickle
+import json
+from urllib2 import urlopen
 from bs4 import BeautifulSoup
 from os import path, listdir
 from numpy import mean, std
-from collections import OrderedDict
 from operator import itemgetter
 from pageviews import format_date, article_views
 
@@ -24,10 +25,14 @@ from utils import get_sentences
 from utils import count_syllables
 from utils import count_complex_words
 
+# cmlimit to specify number of articles to extract, max can be 500 (5000 for bots)
+# cmtitle for name of Category to look in
+# cmstartsortkeyprefix for starting the article listing from a particular alphabet or set of alphabets, 
+# 'p' for PA
+copy_edit_url = 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=500&format=json&cmtitle=Category:All_articles_needing_copy_edit&cmstartsortkeyprefix=ap' ###
 
-copy_edit_url = 'https://en.wikipedia.org/wiki/Category:All_articles_needing_copy_edit'
 xml_api_url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext&format=xml'
-recdir = 'records' + path.sep
+recdir = 'TL_records' + path.sep 	###
 
 
 def nextrecord():
@@ -44,54 +49,56 @@ def flesch_kincaid_score(article):
 	xml_url = '&titles='.join([xml_api_url, title])
 	try:
 		xml = requests.get(xml_url).content
+		bs = BeautifulSoup(xml)
+
+		try:
+			text = str(bs.find('extract').contents[0].encode('utf-8'))	# convert NavigableString to string after encoding
+			non_text = ['== See also ==\n', '== References ==\n', ' === Further references ===\n', '== External links ==\n', '== Notes ==\n']
+			for ele in non_text:
+				text = text.split(ele, 1)[0]
+			text = re.sub('==.*==', '', text)
+			words = get_words(text)
+			syllableCount = count_syllables(text)
+			sentences = get_sentences(text)
+			fk = 206.835 - 1.015*len(words)/len(sentences) - 84.6*(syllableCount)/len(words)
+			return float(format(fk,'.2f'))
+		except:
+			print 'Error while computing fk score of ' + article
+			print format_exc()
+
 	except:
 		print 'Error while fetching xml content of ' + article
-		print traceback.format_exc()
+		print format_exc()
 	
-	bs = BeautifulSoup(xml)
-	try:
-		text = str(bs.find('extract').contents[0].encode('utf-8'))	# convert NavigableString to string after encoding
-		non_text = ['== See also ==\n', '== References ==\n', ' === Further references ===\n', '== External links ==\n', '== Notes ==\n']
-		for ele in non_text:
-			text = text.split(ele, 1)[0]
-		text = re.sub('==.*==', '', text)
-		words = get_words(text)
-		syllableCount = count_syllables(text)
-		sentences = get_sentences(text)
-		fk = 206.835 - 1.015*len(words)/len(sentences) - 84.6*(syllableCount)/len(words)
-
-		return float(format(fk,'.2f'))
-	except:
-		print 'Error while computing fk score of ' + article
-		print traceback.format_exc()
+	
 
 
 if __name__ == '__main__':
 
 	try:
-		r = requests.get(copy_edit_url)
+		json_obj = urlopen(copy_edit_url).read()
 	except:
-		print "Error while obtaining copy-edit backlogs"
-		print traceback.format_exc()
+		print "Error while obtaining articles from Category API"
+		print format_exc()
+		exit()
 
-	bs = BeautifulSoup(r.text)
+	readable_json = json.loads(json_obj)
 	cnt = 0
-	d = []
-	print '\nFetching articles from the copy-edit backlog category:\n'
-	for catgroup in bs.find_all('div', 'mw-category-group'):
-		for entry in catgroup.find_all('li'):
-			a = entry.find('a')
-			link = 'https://en.wikipedia.org' + a.get('href')
-			title = a.get('title').encode('utf8')
-			pageviews = article_views(title)
-			fk_score = flesch_kincaid_score(title)
-			print title, link, pageviews, fk_score
-			d.append([title, link, pageviews, fk_score])
-			cnt = cnt+1
-			if(cnt==5):
-				break
-		if(cnt==5):
-				break
+	d = []						# list of lists of rankings to be stored in a pickle file
+	for ele in readable_json['query']['categorymembers']:
+		title = ele['title'].encode('utf8')
+		link = '/'.join(['https://en.wikipedia.org/wiki', title.replace(' ', '_')])
+		pageviews = article_views(title)
+		fk_score = flesch_kincaid_score(title)
+		if (pageviews == None):
+			print 'Error while obtaining pageviews for ' + title
+			continue
+		if (fk_score == None):
+			print 'Error while obtaining F-K score for ' + title
+			continue
+		print cnt+1, title, link, pageviews, fk_score
+		d.append([title, link, pageviews, fk_score])
+		cnt = cnt+1
 
 	pv = []
 	fk = []
@@ -107,16 +114,16 @@ if __name__ == '__main__':
 		print i
 	#od = OrderedDict(sorted(d.items(), key=lambda t:t[1][3], reverse=True))	# ordered dict in descending order of final score
 	od = sorted(d, key=itemgetter(4), reverse=True)		# ordered list in descending order of final score
-	print '\n\nArticle rankings based on final score:\n'
-	for item in od:
-		print item
-	with open('copy_edit_ranking.pkl', 'wb') as f:
+	#print '\n\nArticle rankings based on final score:\n'
+	#for item in od:
+	#	print item
+	with open('TL_pickles/copy_edit_ap_ranking.pkl', 'wb') as f:
 		pickle.dump(od, f)
 # if __name__ == '__main__':
-# 	with open('copy_edit_ranking.pkl', 'rb') as f:	# use when od has already been created; comment above stuff
+# 	with open('PA_pickles/copy_edit_ranking.pkl', 'rb') as f:	### use when od has already been created; comment above stuff
 # 		od = pickle.load(f)
 	cnt = 0		
-	counter = int(ceil(0.2*len(od)))	# top 20% of rankings
+	counter = int(ceil(0.25*len(od)))	# top 20% of rankings
 
 	#url = 'http://127.0.0.1:5000/ask'	# url for POSTing to ask. Replace with Labs/PythonAnywhere instance if needed
 	
