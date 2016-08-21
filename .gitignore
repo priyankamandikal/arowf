@@ -89,7 +89,6 @@ ENV/
 .ropeproject
 
 # registered user info
-registered/
 users.pkl
 
 # records folder
@@ -99,4 +98,4 @@ records/
 *.pkl
 
 # log directory
-logs/
+
