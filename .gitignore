@@ -90,6 +90,7 @@ ENV/
 
 # registered user info
 users.pkl
+registered/
 
 # records folder
 records/
@@ -98,4 +99,4 @@ records/
 *.pkl
 
 # log directory
-
+logs/
