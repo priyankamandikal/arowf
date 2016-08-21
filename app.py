@@ -122,6 +122,17 @@ def register():
     with open('users.pkl', 'r') as f:
         userdict = load(f)
     if request.method == 'GET':
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
+            token = session['token']
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
+            log = user+' '+request.environ['REMOTE_ADDR']+' register'+' GET\n'
+            f.write(log)
         return render_template('register.html', userdict=userdict) # inputs for name, email, timezone, phone, aboutme
     elif request.method == 'POST':
         uname = str(request.form['uname'])      # mandatory
@@ -140,6 +151,17 @@ def register():
         with open('users.pkl', 'w') as f:       # dictionary with keys as usernames and values as emails
             dump(userdict, f)
         send_email(email, 'Welcome to AROWF!', 'registration_mail', name=uname, token=token)    # send welcome email with token
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
+            token = session['token']
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
+            log = user+' '+request.environ['REMOTE_ADDR']+' register'+' POST\n'
+            f.write(log)
         return redirect(url_for('index'))
 
 
@@ -148,11 +170,14 @@ def ask():
     if request.method == 'GET':
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        token = 'Anonymous'
+        user = 'Anonymous'                      # Username is Anonymous by default
         if 'token' in session:
             token = session['token']
-        with open(logfn, 'a') as f:     # logging token, IP addr, end-point, request type
-            log = token+' '+request.environ['REMOTE_ADDR']+' ask'+' GET'+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
+            log = user+' '+request.environ['REMOTE_ADDR']+' ask'+' GET'+'\n'
             f.write(log)
         return render_template('ask.html') # single textarea & submit button
     elif request.method == 'POST':
@@ -173,18 +198,20 @@ def ask():
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        token = 'Anonymous'
+        user = 'Anonymous'                      # Username is Anonymous by default
         if 'token' in session:
             token = session['token']
-        with open(logfn, 'a') as f:     # logging token, IP addr, end-point, request type, question number
-            log = token+' '+request.environ['REMOTE_ADDR']+' ask'+' POST'+' '+qn_number+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type, question number
+            log = user+' '+request.environ['REMOTE_ADDR']+' ask'+' POST '+qn_number+'\n'
             f.write(log)
         if 'token' in session:
             userfile = 'registered/'+session['token']
             if path.exists(fn):
                 with open(userfile, 'a') as f:
                     f.write(fn[8:]+'\n')
-
         flash('Thanks for the question.')  # displays in layout.html
         return redirect(url_for('index'))  # GET /
 
@@ -224,11 +251,14 @@ def answer():
                 files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())        # read textual contents of each
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        token = 'Anonymous'
-        if 'token' in session:  # logging token, IP addr, end-point, request type, question number, needed answer
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
             token = session['token']
-        with open(logfn, 'a') as f:     
-            log = token+' '+request.environ['REMOTE_ADDR']+' answer'+' GET'+' '+chosen+' '+needs+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type, question number, required answer
+            log = user+' '+request.environ['REMOTE_ADDR']+' answer'+' GET'+' '+chosen+' '+needs+'\n'
             f.write(log)
         return render_template('answer.html', record=chosen, response=needs,
                                files=files) # invoke the template
@@ -256,11 +286,14 @@ def answer():
                 f.write('--REGISTRATION-ID:'+session['token']+'--')
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        token = 'Anonymous'
-        if 'token' in session:  # logging token, IP addr, end-point, request type, question number, given answer
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
             token = session['token']
-        with open(logfn, 'a') as f:     
-            log = token+' '+request.environ['REMOTE_ADDR']+' answer'+' POST'+' '+record+' '+response+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:    # logging username, IP addr, end-point, request type, question number, given answer 
+            log = user+' '+request.environ['REMOTE_ADDR']+' answer'+' POST'+' '+record+' '+response+'\n'
             f.write(log)
         if 'token' in session:
             userfile = 'registered/'+session['token']
@@ -292,11 +325,14 @@ def recommend():
                 files[suffix] = sub(r'--REGISTRATION-ID:.*--$', '', f.read())            # read textual contents of each
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        token = 'Anonymous'
-        if 'token' in session:  
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
             token = session['token']
-        with open(logfn, 'a') as f: # logging token, IP addr, end-point, request type, question number
-            log = token+' '+request.environ['REMOTE_ADDR']+' recommend'+' GET '+selection+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f: # logging username, IP addr, end-point, request type, question number
+            log = user+' '+request.environ['REMOTE_ADDR']+' recommend'+' GET '+selection+'\n'
             f.write(log)
         return render_template('recommend.html', record=selection, files=files) 
     elif request.method == 'POST':
@@ -320,14 +356,17 @@ def recommend():
         od = OrderedDict(sorted(modtime.items(), key=lambda t: t[1]))
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn1 = './logs/activity-'+logdate
-        token = 'Anonymous'
-        if 'token' in session:  
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
             token = session['token']
-        with open(logfn1, 'a') as f: # logging token, IP addr, end-point, request type, question number in activities
-            log = token+' '+request.environ['REMOTE_ADDR']+' recommend'+' POST '+record+'\n'
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn1, 'a') as f: # logging username, IP addr, end-point, request type, question number in activities
+            log = user+' '+request.environ['REMOTE_ADDR']+' recommend'+' POST '+record+'\n'
             f.write(log)
         logfn2 = './logs/results-'+logdate
-        with open(logfn2, 'a') as f: # logging question number, types and mod times of all realted files in the order of creation in results
+        with open(logfn2, 'a') as f: # logging question number, types and mod times of all related files in the order of creation in results
             f.write(record+' ')
             for qntype, mtime in od.items():
                 log = qntype+' '+datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')+' '
@@ -430,6 +469,22 @@ def inspect():
     else:
         ratio='n/a'
 
+    logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+    logfn = './logs/activity-'+logdate
+    user = 'Anonymous'                      # Username is Anonymous by default
+    if 'token' in session:
+        token = session['token']
+        tokenfilename = 'registered/'+token
+        with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+            user = f.readline()[:-1]
+    if searchstring == None:
+        searchstring = ''
+    if reviewer == None:
+        reviewer = ''
+    with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type, #searchstring#, #reviewer#
+        log = user+' '+request.environ['REMOTE_ADDR']+' inspect'+' GET #'+searchstring+'# #'+reviewer+'#\n'
+        f.write(log)
+
     return render_template('inspect.html', count=count, first=first, \
         last=last, mindate=ctime(mindate), maxdate=ctime(maxdate), \
         meandate=meandate, searchstring=searchstring, \
@@ -460,10 +515,32 @@ def help():
 @app.route('/token', methods=['GET', 'POST'])
 def token():
     if request.method == 'GET':
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
+            token = session['token']
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
+            log = user+' '+request.environ['REMOTE_ADDR']+' token'+' GET\n'
+            f.write(log)
         tokenNames = listdir('registered/')         # get list of all tokens
         return render_template('token.html', token=session['token'], tokenNames=tokenNames) # displays links to help docs for each end-point
     elif request.method == 'POST':                  # if token not set in session key
         session['token'] = request.form['token']    # obtain from form and set it
+        logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+        logfn = './logs/activity-'+logdate
+        user = 'Anonymous'                      # Username is Anonymous by default
+        if 'token' in session:
+            token = session['token']
+            tokenfilename = 'registered/'+token
+            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+                user = f.readline()[:-1]
+        with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
+            log = user+' '+request.environ['REMOTE_ADDR']+' token'+' POST\n'
+            f.write(log)
         return redirect(url_for('index'))
 
 
@@ -490,7 +567,7 @@ if __name__ == '__main__':
     app.run(
       use_reloader = True # reloads this source file when changed
      , use_debugger=True
-     , debug = True # see http://flask.pocoo.org/docs/0.11/errorhandling/
+     , debug = environ.get('DEBUGGER') # see http://flask.pocoo.org/docs/0.11/errorhandling/
            )                    # runs on http://127.0.0.1:5000/
 
 # end
