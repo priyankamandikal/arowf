@@ -153,14 +153,8 @@ def register():
         send_email(email, 'Welcome to AROWF!', 'registration_mail', name=uname, token=token)    # send welcome email with token
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
-        user = 'Anonymous'                      # Username is Anonymous by default
-        if 'token' in session:
-            token = session['token']
-            tokenfilename = 'registered/'+token
-            with open(tokenfilename, 'r') as f: # for getting username associated with the set token
-                user = f.readline()[:-1]
         with open(logfn, 'a') as f:     # logging username, IP addr, end-point, request type
-            log = user+' '+request.environ['REMOTE_ADDR']+' register'+' POST\n'
+            log = uname+' '+request.environ['REMOTE_ADDR']+' register'+' POST\n'
             f.write(log)
         return redirect(url_for('index'))
 
@@ -527,9 +521,12 @@ def token():
             log = user+' '+request.environ['REMOTE_ADDR']+' token'+' GET\n'
             f.write(log)
         tokenNames = listdir('registered/')         # get list of all tokens
-        return render_template('token.html', token=session['token'], tokenNames=tokenNames) # displays links to help docs for each end-point
+        return render_template('token.html', user=user, tokenNames=tokenNames) # displays links to help docs for each end-point
     elif request.method == 'POST':                  # if token not set in session key
-        session['token'] = request.form['token']    # obtain from form and set it
+        if request.form['tokeninput'] != 'null':
+            session['token'] = request.form['tokeninput']    # obtain from form and set it
+        else:
+            session.pop('token', None)
         logdate = datetime.strftime(date.today(), '%Y-%m-%d')
         logfn = './logs/activity-'+logdate
         user = 'Anonymous'                      # Username is Anonymous by default
@@ -546,11 +543,33 @@ def token():
 
 @app.errorhandler(404)
 def page_not_found(error):
+    logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+    logfn = './logs/activity-'+logdate
+    user = 'Anonymous'                      # Username is Anonymous by default
+    if 'token' in session:
+        token = session['token']
+        tokenfilename = 'registered/'+token
+        with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+            user = f.readline()[:-1]
+    with open(logfn, 'a') as f:     # logging username, IP addr, error code
+        log = user+' '+request.environ['REMOTE_ADDR']+' 404\n'
+        f.write(log)
     return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
 def page_not_found(error):
+    logdate = datetime.strftime(date.today(), '%Y-%m-%d')
+    logfn = './logs/activity-'+logdate
+    user = 'Anonymous'                      # Username is Anonymous by default
+    if 'token' in session:
+        token = session['token']
+        tokenfilename = 'registered/'+token
+        with open(tokenfilename, 'r') as f: # for getting username associated with the set token
+            user = f.readline()[:-1]
+    with open(logfn, 'a') as f:     # logging username, IP addr, error code
+        log = user+' '+request.environ['REMOTE_ADDR']+' 500\n'
+        f.write(log)
     return render_template('500.html'), 500
 
 

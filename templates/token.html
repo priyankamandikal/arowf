@@ -1,14 +1,18 @@
 {% extends "layout.html" %}
 {% block page_content %}
-  {% if token %}
+  {% if 'token' in session %}
   	<p>Your token has already been set. You can start contributing!</p>
+    <form action="{{ url_for('token') }}" method=post onsubmit="return clearToken('{{ user|safe }}')">
+      <input type="submit" value="Clear Token" />
+      <input id="tokeninput" name="tokeninput" style="visibility:hidden;"/>
+    </form>
   {% else %}
   	<p>Your token hasn't been set. Kindly paste the token that was mailed to you during registration.</p>
   	<form action="{{ url_for('token') }}" method=post onsubmit="return canSubmitToken({{ tokenNames|safe }})">
-      <input id=token type=text name=token style="width: 40%;" required />
+      <input id="tokeninput" type="text" name="tokeninput" style="width: 40%;" required />
       <br/>
       <br/>
-      <input type=submit value='Set Token' />
+      <input type="submit" value="Set Token" />
   	</form>
   {% endif %}
 {% endblock %}

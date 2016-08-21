@@ -39,8 +39,19 @@
       }
     }
 
+    function clearToken(user) {
+      if (confirm('Do you really want to clear token for username '+user+'?')){
+        document.getElementById('tokeninput').value = 'null';
+        location.href = '/';
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+
     function canSubmitTokenFunc(tokenVal) {
-      return tokenVal == document.getElementById('token').value;
+      return tokenVal == document.getElementById('tokeninput').value;
     }
 
     function canSubmitToken(arr) {
