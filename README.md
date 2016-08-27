@@ -1,4 +1,4 @@
-# minireview
+# Accuracy Review of Wikipedias in Flash
 
 Registration-free open source text-based blind review system for
 Accuracy Review of Wikipedias 2016 Google Summer of Code project for
