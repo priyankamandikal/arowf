@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block page_content %}
     <ul>
-        <li><a href="{{ url_for('ask') }}">/ask</a>: enter a question
         <li><a href="{{ url_for('answer') }}">/answer</a>: 
             answer, review, or tie-break questions
         <li><a href="{{ url_for('recommend') }}">/recommend</a>:
             see recommendations for implementation
+        <li><a href="{{ url_for('ask') }}">/ask</a>: enter a question
         <li><a href="{{ url_for('inspect') }}">/inspect</a>:
             see all records of questions, answers, reviews, and implementations
     </ul>

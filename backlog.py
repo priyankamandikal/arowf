@@ -88,11 +88,11 @@ if __name__ == '__main__':
 			exit()
 		f = open(fn, 'w')
 		# use 'How would you resolve it?' for NPOV and 'How would you update it?' for outdated
-		f.write('The article <a href="' + i[1] + '">' + i[0] + 
-			'</a> is in <a href = "https://en.wikipedia.org/wiki/'+ i[3] + '">' + i[3] + 
+		f.write('The article <a target="_blank" href="' + i[1] + '">' + i[0] + 
+			'</a> is in <a target="_blank" href = "https://en.wikipedia.org/wiki/'+ i[3] + '">' + i[3] + 
 			'</a>. How would you resolve it?<br/><a style="float:right;" href="' + 
 			i[1] + '">'+i[1]+'</a><iframe src="' + i[1] + 
-			'" style="height: 40%; width: 100%;">[Can not display <a href="' + i[1] + '">' 
+			'" style="height: 40%; width: 100%;">[Can not display <a target="_blank" href="' + i[1] + '">' 
 			+ i[1] + '</a> inline as an iframe here.]</iframe>')	###
 		f.close()
 		cnt += 1

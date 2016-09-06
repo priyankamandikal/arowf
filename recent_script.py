@@ -126,11 +126,11 @@ if __name__ == '__main__':
 
         with open(fn, 'w') as f:
             try:
-                f.write('The article <a href="' + i[1] + '">' + i[0] + 
+                f.write('The article <a target="_blank" href="' + i[1] + '">' + i[0] + 
                     '</a> has the word \'recently\' inserted in ' + i[4] +
                     '. Is it still correctly used? The context is:</br><i>' + i[3] + 
-                    '</i></br><a style="float:right;" href="'+i[1]+'">'+i[1]+'</a><iframe src="' + i[1] + 
-                    '" style="height: 40%; width: 100%;">[Can not display <a href="' + 
+                    '</i></br><a target="_blank" style="float:right;" href="'+i[1]+'">'+i[1]+'</a><iframe src="' + i[1] + 
+                    '" style="height: 40%; width: 100%;">[Can not display <a target="_blank" href="' + 
                     i[1] + '">' + i[1] + '</a> inline as an iframe here.]</iframe>')
                 cnt = cnt + 1
             except:

@@ -140,11 +140,11 @@ if __name__ == '__main__':
 			print('A billion questions reached! Start answering!')
 			exit()
 		f = open(fn, 'w')
-		f.write('The article <a href="' + i[1] + '">' + i[0] + 
-			'</a> is too wordy with a median <a href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' 
+		f.write('The article <a target="_blank" href="' + i[1] + '">' + i[0] + 
+			'</a> is too wordy with a median <a target="_blank" href = "https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease">Flesh-Kincaid readability score</a> of ' 
 			+ str(i[3]) + '.</br>How would you rewrite it to be easier to read?<br/><a style="float:right;" href="'
 			+ i[1] + '">' + i[1] + '</a><iframe src="' + i[1] + 
-			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[1] + '">' + i[1] 
+			'" style="height: 40%; width: 100%">[Can not display <a target="_blank" href="' + i[1] + '">' + i[1] 
 			+ '</a> inline as an iframe here.]</iframe>')
 		f.close()
 		cnt += 1

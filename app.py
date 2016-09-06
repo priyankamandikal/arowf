@@ -459,7 +459,7 @@ def inspect():
         
     denom = revieweragree + reviewerdised   # agreement ratio
     if denom > 0:
-        ratio='%2.0f%%' % ((revieweragree+0.0 / denom) * 100)
+        ratio='%2.0f%%' % (((revieweragree+0.0) / denom) * 100)
     else:
         ratio='n/a'
 

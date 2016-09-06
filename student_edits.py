@@ -148,10 +148,10 @@ if __name__ == '__main__':
 			print('A billion questions reached! Start answering!')
 			exit()
 		f = open(fn, 'w')
-		f.write('The article <a href="' + i[2] + '">' + i[1] + 
-			'</a> was edited by a student editor.</br>The diff corresponding to the edit is displayed below. Has it been correctly edited?<br/><a style="float:right;" href="'
+		f.write('The article <a target="_blank" href="' + i[2] + '">' + i[1] + 
+			'</a> was edited by a student editor.</br>The diff corresponding to the edit is displayed below. Has it been correctly edited?<br/><a target="_blank" style="float:right;" href="'
 			+ i[3] + '">' + i[3] + '</a><iframe src="' + i[3] + 
-			'" style="height: 40%; width: 100%">[Can not display <a href="' + i[3] + '">' + i[3] 
+			'" style="height: 40%; width: 100%">[Can not display <a target="_blank" href="' + i[3] + '">' + i[3] 
 			+ '</a> inline as an iframe here.]</iframe>')
 		f.close()
 		cnt += 1
