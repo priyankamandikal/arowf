@@ -6,4 +6,6 @@ Wikimedia Foundation.
 
 Please see https://priyankamandikal.github.io/posts/gsoc-2016-project-overview/
 
+Two initial question datasets are at https://drive.google.com/file/d/0B73LgocyHQnfNlhVQlRIRVFCMVNteldpUFNWbEd4dTZVUjNj/view
+
 License: Apache v2 or latest with stronger patent sharing if available.
