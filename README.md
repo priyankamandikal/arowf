@@ -1,4 +1,4 @@
-# Accuracy Review of Wikipedias in Flash
+# Accuracy Review of Wikipedias in Flask
 
 Registration-free open source text-based blind review system for
 Accuracy Review of Wikipedias 2016 Google Summer of Code project for
